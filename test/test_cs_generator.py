@@ -5,7 +5,7 @@ from code_filter import filter_code
 def test_cs_generator_01_01():
     cs_generator = CSGenerator()
     puml = open('./test/data/plant_uml/test01.puml', 'r').read()
-    istate = open('./test/data/cs/test01/IState.cs').read()
+    istate = open('./test/data/cs/test01/BaseState.cs').read()
     generator = StateMachineGenerator()
     files = generator.generate_for_puml(puml, cs_generator)
     assert 'BaseState.cs' in files
