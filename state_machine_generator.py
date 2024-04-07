@@ -19,7 +19,7 @@ class StateMachineGenerator:
             }
 
     def generate_for_puml(sellf, puml):
-        lines = filter_code(open(puml, 'r')).split()
+        lines = filter_code(open(puml, 'r')).split('\n')
         if len(lines):
             return (False, 'puml does not contains @startuml or/and @enduml.')
         if lines[0] != '@startuml':
