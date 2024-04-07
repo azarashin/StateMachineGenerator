@@ -1,17 +1,17 @@
 public class StateController
 {
     private IControllee _controllee;
-    private IState? _currentState; 
-    public IState InstanceOfStateState1 {get; private set;}
-    public IState InstanceOfStateState2 {get; private set;}
+    private BaseState? _currentState; 
+    public BaseState InstanceOfState1 {get; private set;}
+    public BaseState InstanceOfState2 {get; private set;}
     public StateController(IControllee controllee)
     {
         _controllee = controllee;
-        InstanceOfStateState1 = new StateState1(this, _controllee);
-        InstanceOfStateState2 = new StateState2(this, _controllee);
-        _currentState = InstanceOfStateState1; 
+        InstanceOfState1 = new StateState1(this, _controllee);
+        InstanceOfState2 = new StateState2(this, _controllee);
+        _currentState = InstanceOfState1; 
     }
-    public void ExecCommand1()
+    public void TransitCommand1()
     {
         if(_currentState != null)
         {
@@ -20,7 +20,7 @@ public class StateController
             _controllee.OverTransition("Command1");
         }
     }
-    public void ExecCommand2()
+    public void TransitCommand2()
     {
         if(_currentState != null)
         {
@@ -29,7 +29,7 @@ public class StateController
             _controllee.OverTransition("Command2");
         }
     }
-    public void ExecCommand3()
+    public void TransitCommand3()
     {
         if(_currentState != null)
         {

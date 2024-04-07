@@ -2,11 +2,11 @@
 IControllee controllee = new ConsoleOutControllee();
 StateController stateController = new StateController(controllee);
 
-stateController.ExecCommand2();
-stateController.ExecCommand2();
-stateController.ExecCommand1();
-stateController.ExecCommand1();
-stateController.ExecCommand3();
-stateController.ExecCommand3();
-stateController.ExecCommand1();
-stateController.ExecCommand1();
+stateController.TransitCommand2();
+stateController.TransitCommand2();
+stateController.TransitCommand1();
+stateController.TransitCommand1();
+stateController.TransitCommand3();
+stateController.TransitCommand3();
+stateController.TransitCommand1();
+stateController.TransitCommand1();

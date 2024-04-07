@@ -1,25 +1,24 @@
-public class StateState1 : IState
+public class StateState1 : BaseState
 {
     private StateController _stateController; 
     private IControllee _controllee; 
-    public StateState1(StateController stateController, IControllee controllee)
+    public StateState1(StateController stateController, IControllee controllee) : base(controllee)
     {
         _stateController = stateController;
         _controllee = controllee;
     }
-    public IState? TransitCommand1()
+    public override BaseState? TransitCommand1()
     {
         _controllee.DoAction1();
         return null;
     }
-    public IState? TransitCommand2()
+    public override BaseState? TransitCommand2()
     {
         _controllee.DoAction2();
-        return _stateController.InstanceOfStateState2;
+        return _stateController.InstanceOfState2;
     }
-    public IState? TransitCommand3()
+    protected override string GetStateName()
     {
-        _controllee.NoTransition("State1", "Command3");
-        return this;
+        return "State1"; 
     }
 }
