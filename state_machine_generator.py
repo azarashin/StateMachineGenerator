@@ -38,20 +38,3 @@ class StateMachineGenerator:
             'ConsoleOutControllee.cs': 'source_body4', 
             }
 
-    def is_initial_transition(self, line):
-        m = self._initial_transition.search(line)
-        if m:
-            return (True, m.group(2), m.group(1))
-        return (False, None, None)
-
-    def is_transition(self, line):
-        m0 = self._transition_no_event_no_action.search(line)
-        if m0:
-            return (True, m0.group(1), m0.group(3), m0.group(2), None, None)
-        m1 = self._transition_no_action.search(line)
-        if m1:
-            return (True, m1.group(1), m1.group(3), m1.group(2), m1.group(4), None)
-        m2 = self._transition.search(line)
-        if m2:
-            return (True, m2.group(1), m2.group(3), m2.group(2), m2.group(4), m2.group(5))
-        return (False, None, None, None, None, None)
