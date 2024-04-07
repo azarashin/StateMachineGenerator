@@ -16,6 +16,8 @@ public class StateController
         if(_currentState != null)
         {
             _currentState = _currentState.TransitCommand1();
+        } else {
+            _controllee.OverTransition("Command1");
         }
     }
     public void ExecCommand2()
@@ -23,6 +25,8 @@ public class StateController
         if(_currentState != null)
         {
             _currentState = _currentState.TransitCommand2();
+        } else {
+            _controllee.OverTransition("Command2");
         }
     }
     public void ExecCommand3()
@@ -30,6 +34,8 @@ public class StateController
         if(_currentState != null)
         {
             _currentState = _currentState.TransitCommand3();
+        } else {
+            _controllee.OverTransition("Command3");
         }
     }
 }
