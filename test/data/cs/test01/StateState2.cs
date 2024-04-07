@@ -15,4 +15,5 @@ public class StateState2 : BaseState
     protected override string GetStateName()
     {
         return "State2"; 
-    }}
+    }
+}

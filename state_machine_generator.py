@@ -1,15 +1,13 @@
 from code_filter import filter_code
-import re
+
+from state import StateManager
 
 class StateMachineGenerator:
     
     def __init__(self):
-        self._initial_transition = re.compile("\s*\[\*\]\s*(-+>)\s*(\w+)\s*$")
-        self._transition_no_event_no_action = re.compile("\s*(\w+)\s*(-+>)\s*(\w+|\[\*\])\s*$")
-        self._transition_no_action = re.compile("\s*(\w+)\s*(-+>)\s*(\w+|\[\*\])\s*:\s*(\w+)\s*$")
-        self._transition = re.compile("\s*(\w+)\s*(-+>)\s*(\w+|\[\*\])\s*:\s*(\w+)\s*/\s*(\w+)\s*$")
-#    "\s*\[\*\]\s*[-−−−>]+\s*(\w+)\s*$"
-    def generate(sellf, pumls):
+        self._tab = ' ' * 4
+    
+    def generate(self, pumls):
         return {
             'file_path': 'source_body', 
             'file_path2': 'source_body2', 
@@ -18,23 +16,18 @@ class StateMachineGenerator:
             'ConsoleOutControllee.cs': 'source_body4', 
             }
 
-    def generate_for_puml(sellf, puml):
-        lines = filter_code(open(puml, 'r')).split('\n')
-        if len(lines):
+    def generate_for_puml(self, puml_body, generator):
+        lines = filter_code(puml_body).split('\n')
+        if len(lines) <= 2:
             return (False, 'puml does not contains @startuml or/and @enduml.')
         if lines[0] != '@startuml':
             return (False, 'beginning of puml does not match to @startuml.')
         if lines[-1] != '@enduml':
             return (False, 'end of puml does not match to @enduml.')
-        for line in lines[1:-2]:
-            line
-        states = []
-        transitions = []
-        return {
-            'file_path': 'source_body', 
-            'file_path2': 'source_body2', 
-            'file_path3': 'source_body3', 
-            'file_path4': 'source_body4', 
-            'ConsoleOutControllee.cs': 'source_body4', 
-            }
-
+        state_manager = StateManager(puml_body)
+        state_list = state_manager.get_state_list()
+        states = state_list.values()
+        transitions = state_manager.get_transitions()
+        files = generator.generate_files(states, transitions)
+        files = {d: files[d].replace('\t', self._tab) for d in files}
+        return files
