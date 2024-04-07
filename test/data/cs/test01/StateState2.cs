@@ -1,4 +1,4 @@
-public class StateState2 : State
+public class StateState2 : IState
 {
     private StateController _stateController; 
     private IControllee _controllee; 
@@ -7,17 +7,17 @@ public class StateState2 : State
         _stateController = stateController;
         _controllee = controllee;
     }
-    public State? TransitCommand1()
+    public IState? TransitCommand1()
     {
         _controllee.NoTransition("State2", "Command1");
         return this;
     }
-    public State? TransitCommand2()
+    public IState? TransitCommand2()
     {
         _controllee.NoTransition("State2", "Command2");
         return this;
     }
-    public State? TransitCommand3()
+    public IState? TransitCommand3()
     {
         _controllee.DoAction3();
         return null;

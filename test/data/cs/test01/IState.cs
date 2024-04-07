@@ -1,6 +1,6 @@
-public interface State
+public interface IState
 {
-    State? TransitCommand1();
-    State? TransitCommand2();
-    State? TransitCommand3();
+    IState? TransitCommand1();
+    IState? TransitCommand2();
+    IState? TransitCommand3();
 }

@@ -1,9 +1,9 @@
 public class StateController
 {
     private IControllee _controllee;
-    private State? _currentState; 
-    public State InstanceOfStateState1 {get; private set;}
-    public State InstanceOfStateState2 {get; private set;}
+    private IState? _currentState; 
+    public IState InstanceOfStateState1 {get; private set;}
+    public IState InstanceOfStateState2 {get; private set;}
     public StateController(IControllee controllee)
     {
         _controllee = controllee;
