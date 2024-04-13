@@ -155,7 +155,19 @@ public class {self._state_controller_class_name}
     def generate_state_class(self, state, transitions):
         target_transitions = [d for d in transitions if d.state_from == state.name]
         transition_codes = '\n'.join([self.generate_transition(d.event, d.action, d.state_to) for d in sorted(target_transitions, key=lambda x: x.event)])
+        description_body = ''
+        if state.description is None or state.description.strip() == '':
+            pass
+        else:
+            description_list = state.description.split('\n')
+            description_body = '/// <summary>\n'
+            for description in description_list:
+                if description.strip() != '':
+                    description_body += f'/// {description.strip()}\n'
+            description_body += '/// </summary>\n'
+        
         ret = f"""
+{description_body}
 public class {self._prefix_state}{state.name} : BaseState
 {{
 \tprivate {self._state_controller_class_name} _stateController; 
