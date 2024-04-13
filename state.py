@@ -8,7 +8,7 @@ class State:
     
 class StateManager: 
     def __init__(self, source):
-        pattern_state_description = re.compile("\s*(\w+)\s*:\s*(.*)$")
+        pattern_state_description = re.compile("^\s*(\w+)\s*:\s*(.*)$")
         transition_manager = TransitionManager()
         self._dic = {}
         self._transitions = []
