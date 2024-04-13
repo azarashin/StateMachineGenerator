@@ -1,3 +1,7 @@
+/// <summary>
+/// this is a string
+/// this is another string
+/// </summary>
 public class StateState1 : BaseState
 {
     private StateController _stateController; 
