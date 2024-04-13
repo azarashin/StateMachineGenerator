@@ -2,6 +2,23 @@ from cs_generator import CSGenerator
 from state_machine_generator import StateMachineGenerator
 from code_filter import filter_code
 
+import glob
+import os
+
+def test_cs_generator_01_dump():
+    cs_generator = CSGenerator()
+    puml = open('./test/data/plant_uml/test01.puml', 'r').read()
+    generator = StateMachineGenerator()
+    exist_file_list = glob.glob("./test/result/*.cs")
+    for file in exist_file_list:
+        os.remove(file)
+
+    files = generator.generate_for_puml(puml, cs_generator)
+    for file in files:
+        path = f'./test/result/{file}'
+        with open(path, 'w') as f:
+            f.write(filter_code(files[file]))
+    
 def test_cs_generator_01_01():
     cs_generator = CSGenerator()
     puml = open('./test/data/plant_uml/test01.puml', 'r').read()
