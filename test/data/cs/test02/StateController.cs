@@ -30,22 +30,4 @@ public class StateController
             _controllee.OverTransition("Command1");
         }
     }
-    public void TransitCommand2()
-    {
-        if(_currentState != null)
-        {
-            _currentState = _currentState.TransitCommand2();
-        } else {
-            _controllee.OverTransition("Command2");
-        }
-    }
-    public void TransitCommand3()
-    {
-        if(_currentState != null)
-        {
-            _currentState = _currentState.TransitCommand3();
-        } else {
-            _controllee.OverTransition("Command3");
-        }
-    }
 }

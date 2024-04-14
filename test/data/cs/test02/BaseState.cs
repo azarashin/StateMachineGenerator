@@ -10,16 +10,6 @@ abstract public class BaseState
         _controllee.NoTransition(GetStateName(), "Command1");
         return this;
     }
-    public virtual BaseState? TransitCommand2()
-    {
-        _controllee.NoTransition(GetStateName(), "Command2");
-        return this;
-    }
-    public virtual BaseState? TransitCommand3()
-    {
-        _controllee.NoTransition(GetStateName(), "Command3");
-        return this;
-    }
     public virtual BaseState? TryTransitWithoutEvent()
     {
         return this;
