@@ -1,0 +1,15 @@
+@startuml
+scale 350 width
+[*] --> Initial
+
+Initial --> NotShooting : GoInTo / Action0
+
+state NotShooting {
+  [*] --> Idle
+  Idle --> Configuring : EvConfig / Action1
+  Configuring --> Idle : EvConfig / Action2
+}
+
+NotShooting --> Escaped : Escape / Action3
+
+@enduml
