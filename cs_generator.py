@@ -34,16 +34,20 @@ class CSGenerator:
 """
     
     def generate_base_state(self, transitions):
-        state_list = '\n'.join([self.transition_method(d.event) for d in transitions if d.event is not None])
+        transition_list = '\n'.join([self.transition_method(d.event) for d in transitions if d.event is not None])
         ret = f"""
 abstract public class {self._base_state_class_name}
 {{
 \tprivate IControllee _controllee; 
-\tpublic BaseState(IControllee controllee)
+\tpublic {self._base_state_class_name}(IControllee controllee)
 \t{{
 \t\t_controllee = controllee;
 \t}}
-{state_list}
+{transition_list}
+\tpublic virtual {self._base_state_class_name}? TryTransitWithoutEvent()
+\t{{
+\t\treturn this;
+\t}}
 \tprotected abstract string GetStateName();
 }}
         """
@@ -55,11 +59,11 @@ abstract public class {self._base_state_class_name}
     def generate_controllee_interface(self, transitions):
         action_transitions = [d for d in transitions if d.action is not None]
         action_transitions = sorted(action_transitions, key=lambda x: x.action)
-        action_list = '\n'.join([self.action_method(d.action) for d in action_transitions])
+        transition_list = '\n'.join([self.action_method(d.action) for d in action_transitions])
         ret = f"""
 public interface {self._icontrollee_class_name}
 {{
-{action_list}
+{transition_list}
 \tvoid NoTransition(string state, string transition);
 \tvoid OverTransition(string transition);
 }}
@@ -129,6 +133,16 @@ public class {self._state_controller_class_name}
 {set_state_declarations}
 \t\t_currentState = {self._prefix_instance_of}{initials[0]}; 
 \t}}
+\tpublic bool TryTransitWithoutEvent()
+\t{{
+\t\tif(_currentState == null)
+\t\t{{
+\t\t\treturn false; 
+\t\t}}
+\t\t{self._base_state_class_name}? current = _currentState; 
+\t\t_currentState = _currentState.TryTransitWithoutEvent();
+\t\treturn (current != _currentState);
+\t}}
 {action_execution_list}
 }}
 """
@@ -143,8 +157,11 @@ public class {self._state_controller_class_name}
             next_state_sequence = "\t\treturn null;"
         else:
             next_state_sequence = f"\t\treturn _stateController.{self._prefix_instance_of}{next_state};"
+        transition_name = f'{self._prefix_method}{event}'
+        if event is None:
+            transition_name = 'TryTransitWithoutEvent'
         ret = f"""
-\tpublic override {self._base_state_class_name}? {self._prefix_method}{event}()
+\tpublic override {self._base_state_class_name}? {transition_name}()
 \t{{
 {action_sequence}
 {next_state_sequence}
@@ -154,7 +171,7 @@ public class {self._state_controller_class_name}
 
     def generate_state_class(self, state, transitions):
         target_transitions = [d for d in transitions if d.state_from == state.name]
-        transition_codes = '\n'.join([self.generate_transition(d.event, d.action, d.state_to) for d in sorted(target_transitions, key=lambda x: x.event)])
+        transition_codes = '\n'.join([self.generate_transition(d.event, d.action, d.state_to) for d in sorted(target_transitions, key=lambda x: x.get_event_as_key())])
         description_body = ''
         if state.description is None or state.description.strip() == '':
             pass
@@ -168,7 +185,7 @@ public class {self._state_controller_class_name}
         
         ret = f"""
 {description_body}
-public class {self._prefix_state}{state.name} : BaseState
+public class {self._prefix_state}{state.name} : {self._base_state_class_name}
 {{
 \tprivate {self._state_controller_class_name} _stateController; 
 \tprivate {self._icontrollee_class_name} _controllee; 
