@@ -34,7 +34,8 @@ class CSGenerator:
 """
     
     def generate_base_state(self, transitions):
-        transition_list = '\n'.join([self.transition_method(d.event) for d in transitions if d.event is not None])
+        event_list = sorted(list(set([d.event for d in transitions if d.event is not None])))
+        transition_list = '\n'.join([self.transition_method(d) for d in event_list])
         ret = f"""
 abstract public class {self._base_state_class_name}
 {{

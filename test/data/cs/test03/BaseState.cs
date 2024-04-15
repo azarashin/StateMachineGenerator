@@ -5,9 +5,9 @@ abstract public class BaseState
     {
         _controllee = controllee;
     }
-    public virtual BaseState? TransitGoInTo()
+    public virtual BaseState? TransitEscape()
     {
-        _controllee.NoTransition(GetStateName(), "GoInTo");
+        _controllee.NoTransition(GetStateName(), "Escape");
         return this;
     }
     public virtual BaseState? TransitEvConfig()
@@ -15,9 +15,9 @@ abstract public class BaseState
         _controllee.NoTransition(GetStateName(), "EvConfig");
         return this;
     }
-    public virtual BaseState? TransitEscape()
+    public virtual BaseState? TransitGoInTo()
     {
-        _controllee.NoTransition(GetStateName(), "Escape");
+        _controllee.NoTransition(GetStateName(), "GoInTo");
         return this;
     }
     public virtual BaseState? TryTransitWithoutEvent()
