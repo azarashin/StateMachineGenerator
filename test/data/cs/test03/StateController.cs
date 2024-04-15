@@ -9,10 +9,10 @@ public class StateController
     public StateController(IControllee controllee)
     {
         _controllee = controllee;
-        InstanceOfInitial = new StateInitial(this, _controllee);
-        InstanceOfIdle = new StateIdle(this, _controllee);
         InstanceOfConfiguring = new StateConfiguring(this, _controllee);
         InstanceOfEscaped = new StateEscaped(this, _controllee);
+        InstanceOfIdle = new StateIdle(this, _controllee);
+        InstanceOfInitial = new StateInitial(this, _controllee);
         _currentState = InstanceOfInitial; 
     }
     public bool TryTransitWithoutEvent()
@@ -25,13 +25,13 @@ public class StateController
         _currentState = _currentState.TryTransitWithoutEvent();
         return (current != _currentState);
     }
-    public void TransitGoInTo()
+    public void TransitEscape()
     {
         if(_currentState != null)
         {
-            _currentState = _currentState.TransitGoInTo();
+            _currentState = _currentState.TransitEscape();
         } else {
-            _controllee.OverTransition("GoInTo");
+            _controllee.OverTransition("Escape");
         }
     }
     public void TransitEvConfig()
@@ -43,13 +43,13 @@ public class StateController
             _controllee.OverTransition("EvConfig");
         }
     }
-    public void TransitEscape()
+    public void TransitGoInTo()
     {
         if(_currentState != null)
         {
-            _currentState = _currentState.TransitEscape();
+            _currentState = _currentState.TransitGoInTo();
         } else {
-            _controllee.OverTransition("Escape");
+            _controllee.OverTransition("GoInTo");
         }
     }
 }

@@ -7,10 +7,6 @@ public class StateEscaped : BaseState
         _stateController = stateController;
         _controllee = controllee;
     }
-    public override BaseState? TryTransitWithoutEvent()
-    {
-        return this;
-    }
     protected override string GetStateName()
     {
         return "Escape"; 

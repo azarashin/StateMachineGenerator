@@ -17,10 +17,6 @@ public class StateConfiguring : BaseState
         _controllee.DoAction2();
         return _stateController.InstanceOfIdle; 
     }
-    public override BaseState? TryTransitWithoutEvent()
-    {
-        return this;
-    }
     protected override string GetStateName()
     {
         return "NotShooting.Configuring"; 
