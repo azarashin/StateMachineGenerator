@@ -1,6 +1,6 @@
 from state import StateManager
 
-def test_initial_transition_01():
+def test_state_01():
     source = """@startuml
 
 [*] --> State1
