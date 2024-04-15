@@ -2,10 +2,10 @@ public class StateController
 {
     private IControllee _controllee;
     private BaseState? _currentState; 
-    public BaseState InstanceOfInitial {get; private set;}
-    public BaseState InstanceOfIdle {get; private set;}
     public BaseState InstanceOfConfiguring {get; private set;}
     public BaseState InstanceOfEscaped {get; private set;}
+    public BaseState InstanceOfIdle {get; private set;}
+    public BaseState InstanceOfInitial {get; private set;}
     public StateController(IControllee controllee)
     {
         _controllee = controllee;
