@@ -59,11 +59,11 @@ abstract public class {self._base_state_class_name}
     def generate_controllee_interface(self, transitions):
         action_transitions = [d for d in transitions if d.action is not None]
         action_transitions = sorted(action_transitions, key=lambda x: x.action)
-        transition_list = '\n'.join([self.action_method(d.action) for d in action_transitions])
+        action_list = '\n'.join(([self.action_method(d.action) for d in action_transitions]))
         ret = f"""
 public interface {self._icontrollee_class_name}
 {{
-{transition_list}
+{action_list}
 \tvoid NoTransition(string state, string transition);
 \tvoid OverTransition(string transition);
 }}
