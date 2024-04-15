@@ -14,11 +14,11 @@ class CSGenerator:
         self._state_controller_class_name = state_controller_class_name
         self._console_controllee_class_name = console_controllee_class_name
 
-    def generate_files(self, states, transitions):
+    def generate_files(self, states, transitions, initial):
         ret = {}
         ret[f'{self._icontrollee_class_name}.cs'] = self.generate_controllee_interface(transitions)
         ret[f'{self._base_state_class_name}.cs'] = self.generate_base_state(transitions)
-        ret[f'{self._state_controller_class_name}.cs'] = self.generate_state_controller(states, transitions)
+        ret[f'{self._state_controller_class_name}.cs'] = self.generate_state_controller(states, transitions, initial)
         ret[f'{self._console_controllee_class_name}.cs'] = self.generate_console_out_controllee(transitions)
         state_classes = self.generate_state_classes(states, transitions)
         for state in state_classes:
@@ -115,8 +115,7 @@ public class {self._console_controllee_class_name} : {self._icontrollee_class_na
 \t}}
 """
 
-    def generate_state_controller(self, states, transitions):
-        initials = [d.state_to for d in transitions if d.state_from is None]
+    def generate_state_controller(self, states, transitions, initial):
         state_declarations = '\n'.join([self.state_declaration(d) for d in sorted(states, key=lambda x: x.name)])
         set_state_declarations = '\n'.join([self.setup_state_declaration(d) for d in sorted(states, key=lambda x: x.name)])
         event_transitions = [d for d in transitions if d.event is not None]
@@ -132,7 +131,7 @@ public class {self._state_controller_class_name}
 \t{{
 \t\t_controllee = controllee;
 {set_state_declarations}
-\t\t_currentState = {self._prefix_instance_of}{initials[0]}; 
+\t\t_currentState = {self._prefix_instance_of}{initial}; 
 \t}}
 \tpublic bool TryTransitWithoutEvent()
 \t{{

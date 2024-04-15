@@ -28,6 +28,7 @@ class StateMachineGenerator:
         state_list = state_manager.get_state_list()
         states = state_list.values()
         transitions = state_manager.get_transitions()
-        files = generator.generate_files(states, transitions)
+        initial = state_manager.get_initial()
+        files = generator.generate_files(states, transitions, initial)
         files = {d: files[d].replace('\t', self._tab) for d in files}
         return files

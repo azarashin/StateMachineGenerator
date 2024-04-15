@@ -5,6 +5,7 @@ class State:
     def __init__(self, name):
         self.name = name; 
         self.description = ''
+        self.initial_state = None
     
 class StateManager: 
     def __init__(self, source):
@@ -17,6 +18,7 @@ class StateManager:
             transition = transition_manager.is_initial_transition(line)
             if transition:
                 self._setup_state(transition.state_to)
+                self.initial_state = transition.state_to
                 if not self._contains_transition(transition, self._transitions):
                     self._transitions.append(transition)
                 
@@ -55,3 +57,6 @@ class StateManager:
     def get_transitions(self):
         return self._transitions
             
+    def get_initial(self):
+        return self.initial_state
+    
