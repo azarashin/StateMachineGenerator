@@ -66,21 +66,43 @@ def test_cs_generator_03_04():
 def test_cs_generator_03_05():
     cs_generator = CSGenerator()
     puml = open('./test/data/plant_uml/test03.puml', 'r').read()
-    istate = open('./test/data/cs/test03/StateState1.cs').read()
+    istate = open('./test/data/cs/test03/StateConfiguring.cs').read()
     generator = StateMachineGenerator()
     files = generator.generate_for_puml(puml, cs_generator)
-    assert 'StateState1.cs' in files
+    assert 'StateConfiguring.cs' in files
     expected = filter_code(istate)
-    actual = filter_code(files['StateState1.cs'])
+    actual = filter_code(files['StateConfiguring.cs'])
     assert expected == actual
 
 def test_cs_generator_03_06():
     cs_generator = CSGenerator()
     puml = open('./test/data/plant_uml/test03.puml', 'r').read()
-    istate = open('./test/data/cs/test03/StateState2.cs').read()
+    istate = open('./test/data/cs/test03/StateEscaped.cs').read()
     generator = StateMachineGenerator()
     files = generator.generate_for_puml(puml, cs_generator)
-    assert 'StateState2.cs' in files
+    assert 'StateEscaped.cs' in files
     expected = filter_code(istate)
-    actual = filter_code(files['StateState2.cs'])
+    actual = filter_code(files['StateEscaped.cs'])
+    assert expected == actual
+
+def test_cs_generator_03_07():
+    cs_generator = CSGenerator()
+    puml = open('./test/data/plant_uml/test03.puml', 'r').read()
+    istate = open('./test/data/cs/test03/StateIdle.cs').read()
+    generator = StateMachineGenerator()
+    files = generator.generate_for_puml(puml, cs_generator)
+    assert 'StateIdle.cs' in files
+    expected = filter_code(istate)
+    actual = filter_code(files['StateIdle.cs'])
+    assert expected == actual
+
+def test_cs_generator_03_08():
+    cs_generator = CSGenerator()
+    puml = open('./test/data/plant_uml/test03.puml', 'r').read()
+    istate = open('./test/data/cs/test03/StateInitial.cs').read()
+    generator = StateMachineGenerator()
+    files = generator.generate_for_puml(puml, cs_generator)
+    assert 'StateInitial.cs' in files
+    expected = filter_code(istate)
+    actual = filter_code(files['StateInitial.cs'])
     assert expected == actual
