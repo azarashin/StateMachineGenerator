@@ -9,6 +9,6 @@ public class StateEscaped : BaseState
     }
     protected override string GetStateName()
     {
-        return "Escape"; 
+        return "Escaped"; 
     }
 }

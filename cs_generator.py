@@ -14,18 +14,18 @@ class CSGenerator:
         self._state_controller_class_name = state_controller_class_name
         self._console_controllee_class_name = console_controllee_class_name
 
-    def generate_files(self, states, transitions, initial):
+    def generate_files(self, state_dic, transitions, initial):
         ret = {}
         ret[f'{self._icontrollee_class_name}.cs'] = self.generate_controllee_interface(transitions)
         ret[f'{self._base_state_class_name}.cs'] = self.generate_base_state(transitions)
-        ret[f'{self._state_controller_class_name}.cs'] = self.generate_state_controller(states, transitions, initial)
+        ret[f'{self._state_controller_class_name}.cs'] = self.generate_state_controller(state_dic, transitions, initial)
         ret[f'{self._console_controllee_class_name}.cs'] = self.generate_console_out_controllee(transitions)
-        state_classes = self.generate_state_classes(states, transitions)
+        state_classes = self.generate_state_classes(state_dic, transitions)
         for state in state_classes:
             ret[f'{self._prefix_state}{state.name}.cs'] = state_classes[state]
         return ret
     
-    def transition_method(self, event):
+    def _transition_method_in_base_state(self, event):
         return f"""\tpublic virtual {self._base_state_class_name}? {self._prefix_method}{event}()
 \t{{
 \t\t_controllee.NoTransition(GetStateName(), "{event}");
@@ -35,7 +35,7 @@ class CSGenerator:
     
     def generate_base_state(self, transitions):
         event_list = sorted(list(set([d.event for d in transitions if d.event is not None])))
-        transition_list = '\n'.join([self.transition_method(d) for d in event_list])
+        transition_list = '\n'.join([self._transition_method_in_base_state(d) for d in event_list])
         ret = f"""
 abstract public class {self._base_state_class_name}
 {{
@@ -59,8 +59,8 @@ abstract public class {self._base_state_class_name}
         
     def generate_controllee_interface(self, transitions):
         action_transitions = [d for d in transitions if d.action is not None]
-        action_transitions = sorted(action_transitions, key=lambda x: x.action)
-        action_list = '\n'.join(([self.action_method(d.action) for d in action_transitions]))
+        action_name_list = sorted(list(set([d.action for d in action_transitions])))
+        action_list = '\n'.join([self.action_method(d) for d in action_name_list])
         ret = f"""
 public interface {self._icontrollee_class_name}
 {{
@@ -79,7 +79,9 @@ public interface {self._icontrollee_class_name}
 """
 
     def generate_console_out_controllee(self, transitions):
-        action_list = '\n'.join([self.console_out_action_method(d.action) for d in transitions if d.action is not None])
+        action_transitions = [d for d in transitions if d.action is not None]
+        action_name_list = sorted(list(set([d.action for d in action_transitions])))
+        action_list = '\n'.join([self.console_out_action_method(d) for d in action_name_list])
         ret = f"""
 public class {self._console_controllee_class_name} : {self._icontrollee_class_name}
 {{
@@ -103,7 +105,7 @@ public class {self._console_controllee_class_name} : {self._icontrollee_class_na
     def setup_state_declaration(self, state):
         return f"""\t\t{self._prefix_instance_of}{state.name} = new {self._prefix_state}{state.name}(this, _controllee);"""
 
-    def action_execution_method(self, event):
+    def transition_method_in_state_controller(self, event):
         return f"""\tpublic void {self._prefix_method}{event}()
 \t{{
 \t\tif(_currentState != null)
@@ -115,12 +117,12 @@ public class {self._console_controllee_class_name} : {self._icontrollee_class_na
 \t}}
 """
 
-    def generate_state_controller(self, states, transitions, initial):
+    def generate_state_controller(self, state_dic, transitions, initial):
+        states = [d for d in state_dic.values() if len(d.children) == 0]
         state_declarations = '\n'.join([self.state_declaration(d) for d in sorted(states, key=lambda x: x.name)])
         set_state_declarations = '\n'.join([self.setup_state_declaration(d) for d in sorted(states, key=lambda x: x.name)])
-        event_transitions = [d for d in transitions if d.event is not None]
-        event_transitions = sorted(event_transitions, key=lambda x: x.action)
-        action_execution_list = '\n'.join([self.action_execution_method(d.event) for d in event_transitions])
+        event_transitions = sorted(list(set([d.event for d in transitions if d.event is not None])))
+        transition_list = '\n'.join([self.transition_method_in_state_controller(d) for d in event_transitions])
         ret = f"""
 public class {self._state_controller_class_name}
 {{
@@ -143,16 +145,23 @@ public class {self._state_controller_class_name}
 \t\t_currentState = _currentState.TryTransitWithoutEvent();
 \t\treturn (current != _currentState);
 \t}}
-{action_execution_list}
+{transition_list}
 }}
 """
         return ret
     
-    def generate_transition(self, event, action, next_state):
+    def actual_next_state(self, state, state_dic):
+        if not state in state_dic or state_dic[state].initial_state is None:
+            return state
+        return self.actual_next_state(state_dic[state].initial_state, state_dic)
+    
+    def generate_transition(self, event, action, next_state, state_dic):
         if action is None:
             action_sequence = ""
         else:
             action_sequence = f"\t\t_controllee.{self._prefix_action_method}{action}();"
+        next_state = self.actual_next_state(next_state, state_dic)
+            
         if next_state == "[*]":
             next_state_sequence = "\t\treturn null;"
         else:
@@ -169,9 +178,9 @@ public class {self._state_controller_class_name}
 """
         return ret
 
-    def generate_state_class(self, state, transitions):
+    def generate_state_class(self, state, transitions, state_dic):
         target_transitions = [d for d in transitions if d.state_from == state.name]
-        transition_codes = '\n'.join([self.generate_transition(d.event, d.action, d.state_to) for d in sorted(target_transitions, key=lambda x: x.get_event_as_key())])
+        transition_codes = '\n'.join([self.generate_transition(d.event, d.action, d.state_to, state_dic) for d in sorted(target_transitions, key=lambda x: x.get_event_as_key())])
         description_body = ''
         if state.description is None or state.description.strip() == '':
             pass
@@ -197,12 +206,12 @@ public class {self._prefix_state}{state.name} : {self._base_state_class_name}
 {transition_codes}
 \tprotected override string GetStateName()
 \t{{
-\t\treturn "{state.name}"; 
+\t\treturn "{state.get_full_name()}"; 
 \t}}
 }}
         """
         return ret
 
-    def generate_state_classes(self, states, transitions):
-        return {d:self.generate_state_class(d, transitions) for d in states}
+    def generate_state_classes(self, state_dic, transitions):
+        return {d:self.generate_state_class(d, transitions, state_dic) for d in state_dic.values()}
 
