@@ -39,8 +39,8 @@ class CSGenerator:
         ret = f"""
 abstract public class {self._base_state_class_name}
 {{
-\tprivate IControllee _controllee; 
-\tpublic {self._base_state_class_name}(IControllee controllee)
+\tprivate {self._icontrollee_class_name} _controllee; 
+\tpublic {self._base_state_class_name}({self._icontrollee_class_name} controllee)
 \t{{
 \t\t_controllee = controllee;
 \t}}
