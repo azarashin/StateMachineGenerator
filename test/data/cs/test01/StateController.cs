@@ -48,4 +48,8 @@ public class StateController
             _controllee.OverTransition("Command3");
         }
     }
+    public BaseState? GetCurrentState()
+    {
+        return _currentState; 
+    }
 }
