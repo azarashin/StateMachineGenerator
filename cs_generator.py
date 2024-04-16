@@ -9,6 +9,7 @@ class CSGenerator:
         self._prefix_action_method = 'Do'
         self._prefix_execution_action_method = 'Exec'
         self._prefix_state = 'State'
+        self._boot_program = 'Program.cs'
         self._icontrollee_class_name = icontrollee_class_name
         self._base_state_class_name = base_state_class_name
         self._state_controller_class_name = state_controller_class_name
@@ -20,6 +21,7 @@ class CSGenerator:
         ret[f'{self._base_state_class_name}.cs'] = self.generate_base_state(transitions)
         ret[f'{self._state_controller_class_name}.cs'] = self.generate_state_controller(state_dic, transitions, initial)
         ret[f'{self._console_controllee_class_name}.cs'] = self.generate_console_out_controllee(transitions)
+        ret[self._boot_program] = self.generate_sample_boot_program(transitions)
         state_classes = self.generate_state_classes(state_dic, transitions)
         for state in state_classes:
             ret[f'{self._prefix_state}{state.name}.cs'] = state_classes[state]
@@ -49,7 +51,7 @@ abstract public class {self._base_state_class_name}
 \t{{
 \t\treturn this;
 \t}}
-\tprotected abstract string GetStateName();
+\tpublic abstract string GetStateName();
 }}
         """
         return ret
@@ -146,6 +148,17 @@ public class {self._state_controller_class_name}
 \t\treturn (current != _currentState);
 \t}}
 {transition_list}
+\tpublic string GetCurrentStateName()
+\t{{
+\t\tif(_currentState == null)
+\t\t{{
+\t\t\treturn "(end)";
+\t\t}}
+\t\telse
+\t\t{{
+\t\t\treturn _currentState.GetStateName(); 
+\t\t}}
+\t}}
 }}
 """
         return ret
@@ -204,7 +217,7 @@ public class {self._prefix_state}{state.name} : {self._base_state_class_name}
 \t\t_controllee = controllee;
 \t}}
 {transition_codes}
-\tprotected override string GetStateName()
+\tpublic override string GetStateName()
 \t{{
 \t\treturn "{state.get_full_name()}"; 
 \t}}
@@ -215,3 +228,59 @@ public class {self._prefix_state}{state.name} : {self._base_state_class_name}
     def generate_state_classes(self, state_dic, transitions):
         return {d:self.generate_state_class(d, transitions, state_dic) for d in state_dic.values()}
 
+
+
+
+
+    def _transition_method_in_base_state(self, event):
+        return f"""\tpublic virtual {self._base_state_class_name}? {self._prefix_method}{event}()
+\t{{
+\t\t_controllee.NoTransition(GetStateName(), "{event}");
+\t\treturn this;
+\t}}
+"""
+
+    def _transition_menu(self, number, event):
+        return f"""\tConsole.WriteLine("{number}. {event}");"""
+
+    def _transition_case(self, number, event):
+        return f"""\t\t\tcase {number}:
+\t\t\t\tstateController.{self._prefix_method}{event}();
+\t\t\t\tbreak;
+"""
+    
+    def generate_sample_boot_program(self, transitions):
+        event_list = sorted(list(set([d.event for d in transitions if d.event is not None])))
+        menu_list = '\n'.join([self._transition_menu(i + 1, event_list[i]) for i in range(len(event_list))])
+        case_list = '\n'.join([self._transition_case(i + 1, event_list[i]) for i in range(len(event_list))])
+        ret = f"""
+IControllee controllee = new ConsoleOutControllee();
+StateController stateController = new StateController(controllee);
+
+int number = 1; 
+while(number != 0)
+{{
+    Console.WriteLine($"current state: {{stateController.GetCurrentStateName()}}");
+    if(stateController.TryTransitWithoutEvent())
+    {{
+        continue; 
+    }}
+{menu_list}
+    Console.WriteLine("");
+    Console.WriteLine("0. exit");
+    string? line = Console.ReadLine();
+    if(int.TryParse(line, out number))
+    {{
+        switch(number)
+        {{
+            case 0:
+                break;
+{case_list}
+            default:
+                Console.WriteLine($"Invalid number: {{number}}");
+                break;
+        }}
+    }}
+}}
+        """
+        return ret
