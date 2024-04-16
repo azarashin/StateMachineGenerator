@@ -4,15 +4,7 @@ StateController stateController = new StateController(controllee);
 int number = 1; 
 while(number != 0)
 {
-    BaseState? currentState = stateController.GetCurrentState();
-    if(currentState == null)
-    {
-        Console.WriteLine($"current state: (end)");
-    }
-    else
-    {
-        Console.WriteLine($"current state: {currentState.GetStateName()}");
-    }
+    Console.WriteLine($"current state: {stateController.GetCurrentStateName()}");
     if(stateController.TryTransitWithoutEvent())
     {
         continue; 
