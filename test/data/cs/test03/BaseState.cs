@@ -24,6 +24,6 @@ abstract public class BaseState
     {
         return this;
     }
-    protected abstract string GetStateName();
+    public abstract string GetStateName();
 
 }

@@ -17,7 +17,7 @@ public class StateConfiguring : BaseState
         _controllee.DoAction2();
         return _stateController.InstanceOfIdle; 
     }
-    protected override string GetStateName()
+    public override string GetStateName()
     {
         return "NotShooting.Configuring"; 
     }

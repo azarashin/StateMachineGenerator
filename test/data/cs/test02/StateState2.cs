@@ -12,7 +12,7 @@ public class StateState2 : BaseState
         _controllee.DoAction3();
         return null;
     }
-    protected override string GetStateName()
+    public override string GetStateName()
     {
         return "State2"; 
     }

@@ -52,4 +52,15 @@ public class StateController
             _controllee.OverTransition("GoInTo");
         }
     }
+    public string GetCurrentStateName()
+    {
+        if(_currentState == null)
+        {
+            return "(end)";
+        }
+        else
+        {
+            return _currentState.GetStateName(); 
+        }
+    }
 }

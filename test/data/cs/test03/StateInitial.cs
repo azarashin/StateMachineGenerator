@@ -12,7 +12,7 @@ public class StateInitial : BaseState
         _controllee.DoAction0();
         return _stateController.InstanceOfIdle; 
     }
-    protected override string GetStateName()
+    public override string GetStateName()
     {
         return "Initial"; 
     }

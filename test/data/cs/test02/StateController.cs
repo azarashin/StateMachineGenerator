@@ -30,4 +30,15 @@ public class StateController
             _controllee.OverTransition("Command1");
         }
     }
+    public string GetCurrentStateName()
+    {
+        if(_currentState == null)
+        {
+            return "(end)";
+        }
+        else
+        {
+            return _currentState.GetStateName(); 
+        }
+    }
 }

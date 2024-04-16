@@ -7,7 +7,7 @@ public class StateEscaped : BaseState
         _stateController = stateController;
         _controllee = controllee;
     }
-    protected override string GetStateName()
+    public override string GetStateName()
     {
         return "Escaped"; 
     }

@@ -20,7 +20,7 @@ public class StateState1 : BaseState
     {
         return _stateController.InstanceOfState2; 
     }
-    protected override string GetStateName()
+    public override string GetStateName()
     {
         return "State1"; 
     }
