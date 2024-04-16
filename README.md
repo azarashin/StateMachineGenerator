@@ -2,9 +2,17 @@
 
 StateMachineGenerator convert state chart code in PlantUML to other language. 
 
-Usage: 
+```
+usage: state_machine_generator.py [-h] --mode MODE --output OUTPUT puml
 
-python StateMachineGenerator.py {type} {name of controller class} {name of controllee interface} {name of controllee implementation}
+positional arguments:
+  puml             path to .puml file
+
+options:
+  -h, --help       show this help message and exit
+  --mode MODE      cs: C#
+  --output OUTPUT  path to output directory
+```
 
 ## using VS Code
 
