@@ -66,6 +66,17 @@ def test_cs_generator_02_04():
 def test_cs_generator_02_05():
     cs_generator = CSGenerator()
     puml = open('./test/data/plant_uml/test02.puml', 'r').read()
+    istate = open('./test/data/cs/test02/Program.cs').read()
+    generator = StateMachineGenerator()
+    files = generator.generate_for_puml(puml, cs_generator)
+    assert 'Program.cs' in files
+    expected = filter_code(istate)
+    actual = filter_code(files['Program.cs'])
+    assert expected == actual
+
+def test_cs_generator_02_06():
+    cs_generator = CSGenerator()
+    puml = open('./test/data/plant_uml/test02.puml', 'r').read()
     istate = open('./test/data/cs/test02/StateState1.cs').read()
     generator = StateMachineGenerator()
     files = generator.generate_for_puml(puml, cs_generator)
@@ -74,7 +85,7 @@ def test_cs_generator_02_05():
     actual = filter_code(files['StateState1.cs'])
     assert expected == actual
 
-def test_cs_generator_02_06():
+def test_cs_generator_02_07():
     cs_generator = CSGenerator()
     puml = open('./test/data/plant_uml/test02.puml', 'r').read()
     istate = open('./test/data/cs/test02/StateState2.cs').read()

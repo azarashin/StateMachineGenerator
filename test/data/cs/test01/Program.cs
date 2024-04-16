@@ -1,4 +1,4 @@
-﻿IControllee controllee = new ConsoleOutControllee();
+IControllee controllee = new ConsoleOutControllee();
 StateController stateController = new StateController(controllee);
 
 int number = 1; 
@@ -9,9 +9,9 @@ while(number != 0)
     {
         continue; 
     }
-    Console.WriteLine("1. TransitCommand1");
-    Console.WriteLine("2. TransitCommand2");
-    Console.WriteLine("3. TransitCommand3");
+    Console.WriteLine("1. Command1");
+    Console.WriteLine("2. Command2");
+    Console.WriteLine("3. Command3");
     Console.WriteLine("");
     Console.WriteLine("0. exit");
     string? line = Console.ReadLine();
