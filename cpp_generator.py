@@ -424,9 +424,9 @@ int main(int argc, const char** argv)
 \t\t\t\tprintf("Invalid number: %d\\n", number);
 \t\t\t\tbreak;
 \t\t}}
-\t\tdelete controllee; 
-\t\tdelete stateController; 
 \t}}
+\tdelete controllee; 
+\tdelete stateController; 
 }}
         """
         return ret
