@@ -12,5 +12,5 @@ public:
     StateState2(StateController* stateController, IControllee* controllee);
     virtual ~StateState2(); 
     virtual BaseState* TransitCommand3();
-    const char* GetStateName();
+    virtual const char* GetStateName();
 };

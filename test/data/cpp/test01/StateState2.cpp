@@ -8,7 +8,8 @@ StateState2::StateState2(StateController* stateController, IControllee* controll
 StateState2::~StateState2()
 {
     
-}BaseState* StateState2::TransitCommand3()
+}
+BaseState* StateState2::TransitCommand3()
 {
     _controllee->DoAction3();
     return 0;
