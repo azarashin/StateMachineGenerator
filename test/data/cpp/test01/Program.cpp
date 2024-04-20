@@ -38,7 +38,7 @@ int main(int argc, const char** argv)
                 printf("Invalid number: %d\n", number);
                 break;
         }
-        delete controllee; 
-        delete stateController; 
     }
+    delete controllee; 
+    delete stateController; 
 }
