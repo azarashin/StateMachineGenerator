@@ -7,11 +7,6 @@ public class StateConfiguring : BaseState
         _stateController = stateController;
         _controllee = controllee;
     }
-    public override BaseState? TransitEscape()
-    {
-        _controllee.DoAction3();
-        return _stateController.InstanceOfEscaped; 
-    }
     public override BaseState? TransitEvConfig()
     {
         _controllee.DoAction2();

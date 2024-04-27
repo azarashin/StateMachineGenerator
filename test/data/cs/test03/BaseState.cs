@@ -5,6 +5,10 @@ abstract public class BaseState
     {
         _controllee = controllee;
     }
+    public virtual void Setup()
+    {
+        return;
+    }
     public virtual BaseState? TransitEscape()
     {
         _controllee.NoTransition(GetStateName(), "Escape");
