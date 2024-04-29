@@ -10,11 +10,13 @@ public class StateIdle : BaseState
     public override BaseState? TransitEscape()
     {
         _controllee.DoAction3();
+        _stateController.InstanceOfEscaped.Setup();
         return _stateController.InstanceOfEscaped; 
     }
     public override BaseState? TransitEvConfig()
     {
         _controllee.DoAction1();
+        _stateController.InstanceOfConfiguring.Setup();
         return _stateController.InstanceOfConfiguring; 
     }
     public override string GetStateName()

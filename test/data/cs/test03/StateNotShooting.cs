@@ -16,6 +16,7 @@ public class StateNotShooting : BaseState
     public override BaseState? TransitEscape()
     {
         _controllee.DoAction3();
+        _stateController.InstanceOfEscaped.Setup();
         return _stateController.InstanceOfEscaped; 
     }
     public override BaseState? TransitEvConfig()

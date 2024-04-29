@@ -17,6 +17,7 @@ BaseState* StateState1::TransitCommand1()
 BaseState* StateState1::TransitCommand2()
 {
     _controllee->DoAction2();
+    _stateController->InstanceOfState2->Setup();
     return _stateController->InstanceOfState2;
 }
 const char* StateState1::GetStateName()

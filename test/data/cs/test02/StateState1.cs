@@ -18,6 +18,7 @@ public class StateState1 : BaseState
     }
     public override BaseState? TryTransitWithoutEvent()
     {
+        _stateController.InstanceOfState2.Setup();
         return _stateController.InstanceOfState2; 
     }
     public override string GetStateName()

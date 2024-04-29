@@ -11,6 +11,7 @@ StateInitial::~StateInitial()
 BaseState* StateInitial::TransitGoInTo()
 {
     _controllee->DoAction0();
+    _stateController->InstanceOfNotShooting->Setup();
     return _stateController->InstanceOfNotShooting;
 }
 const char* StateInitial::GetStateName()

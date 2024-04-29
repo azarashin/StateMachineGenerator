@@ -19,6 +19,7 @@ public class StateState1 : BaseState
     public override BaseState? TransitCommand2()
     {
         _controllee.DoAction2();
+        _stateController.InstanceOfState2.Setup();
         return _stateController.InstanceOfState2;
     }
     public override string GetStateName()

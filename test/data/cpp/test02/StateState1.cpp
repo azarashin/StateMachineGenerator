@@ -18,6 +18,7 @@ BaseState* StateState1::TransitCommand1()
 
 BaseState* StateState1::TryTransitWithoutEvent()
 {
+    _stateController->InstanceOfState2->Setup();
     return _stateController->InstanceOfState2;
 }
 

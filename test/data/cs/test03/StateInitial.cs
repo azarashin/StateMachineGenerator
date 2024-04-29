@@ -10,6 +10,7 @@ public class StateInitial : BaseState
     public override BaseState? TransitGoInTo()
     {
         _controllee.DoAction0();
+        _stateController.InstanceOfNotShooting.Setup();
         return _stateController.InstanceOfNotShooting; 
     }
     public override string GetStateName()

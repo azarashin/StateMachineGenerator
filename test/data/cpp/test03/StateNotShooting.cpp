@@ -15,6 +15,7 @@ void StateNotShooting::Setup()
 BaseState* StateNotShooting::TransitEscape()
 {
     _controllee->DoAction3();
+    _stateController->InstanceOfEscaped->Setup();
     return _stateController->InstanceOfEscaped;
 }
 BaseState* StateNotShooting::TransitEvConfig()

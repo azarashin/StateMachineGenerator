@@ -11,11 +11,13 @@ StateConfiguring::~StateConfiguring()
 BaseState* StateConfiguring::TransitEscape()
 {
     _controllee->DoAction3();
+    _stateController->InstanceOfEscaped->Setup();
     return _stateController->InstanceOfEscaped;
 }
 BaseState* StateConfiguring::TransitEvConfig()
 {
     _controllee->DoAction2();
+    _stateController->InstanceOfIdle->Setup();
     return _stateController->InstanceOfIdle;
 }
 const char* StateConfiguring::GetStateName()
