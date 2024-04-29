@@ -8,6 +8,10 @@ BaseState::~BaseState()
 {
 
 }
+void BaseState::Setup()
+{
+
+} 
 BaseState* BaseState::TransitCommand1()
 {
     _controllee->NoTransition(GetStateName(), "Command1");

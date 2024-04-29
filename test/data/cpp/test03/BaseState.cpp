@@ -7,6 +7,10 @@ BaseState::BaseState(IControllee* controllee)
 BaseState::~BaseState()
 {
 }
+void BaseState::Setup()
+{
+
+} 
 BaseState* BaseState::TransitEscape()
 {
     _controllee->NoTransition(GetStateName(), "Escape");

@@ -9,6 +9,7 @@ private:
 public:
     BaseState(IControllee* controllee);
     virtual ~BaseState();
+    virtual void Setup(); 
     virtual BaseState* TransitCommand1();
     virtual BaseState* TransitCommand2();
     virtual BaseState* TransitCommand3();
