@@ -6,6 +6,7 @@ public class StateController
     public BaseState InstanceOfEscaped {get; private set;}
     public BaseState InstanceOfIdle {get; private set;}
     public BaseState InstanceOfInitial {get; private set;}
+    public BaseState InstanceOfNotShooting {get; private set;}
     public StateController(IControllee controllee)
     {
         _controllee = controllee;
@@ -13,6 +14,7 @@ public class StateController
         InstanceOfEscaped = new StateEscaped(this, _controllee);
         InstanceOfIdle = new StateIdle(this, _controllee);
         InstanceOfInitial = new StateInitial(this, _controllee);
+        InstanceOfNotShooting = new StateNotShooting(this, _controllee);
         _currentState = InstanceOfInitial; 
     }
     public bool TryTransitWithoutEvent()
