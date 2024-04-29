@@ -8,6 +8,7 @@ class StateController;
 #include "StateEscaped.h"
 #include "StateIdle.h"
 #include "StateInitial.h"
+#include "StateNotShooting.h"
 
 class StateController
 {
@@ -19,6 +20,7 @@ public:
     BaseState* InstanceOfEscaped;
     BaseState* InstanceOfIdle;
     BaseState* InstanceOfInitial;
+    BaseState* InstanceOfNotShooting; 
     StateController(IControllee* controllee);
     virtual ~StateController();
     bool TryTransitWithoutEvent();

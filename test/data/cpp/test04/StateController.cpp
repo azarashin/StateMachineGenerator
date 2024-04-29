@@ -7,6 +7,7 @@ StateController::StateController(IControllee* controllee)
     InstanceOfEscaped = new StateEscaped(this, _controllee);
     InstanceOfIdle = new StateIdle(this, _controllee);
     InstanceOfInitial = new StateInitial(this, _controllee);
+    InstanceOfNotShooting = new StateNotShooting(this, _controllee);
     _currentState = InstanceOfInitial;
 }
 StateController::~StateController()
@@ -15,6 +16,7 @@ StateController::~StateController()
     delete InstanceOfEscaped;
     delete InstanceOfIdle;
     delete InstanceOfInitial;
+    delete InstanceOfNotShooting;
 }
 bool StateController::TryTransitWithoutEvent()
 {
