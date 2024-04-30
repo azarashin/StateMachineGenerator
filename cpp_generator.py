@@ -58,6 +58,9 @@ class CPPGenerator:
 {{
 
 }}
+void BaseState::Setup()
+{{
+}} 
 {transition_list}
 {self._base_state_class_name}* {self._base_state_class_name}::TryTransitWithoutEvent()
 {{
@@ -80,6 +83,7 @@ private:
 public:
 \t{self._base_state_class_name}({self._icontrollee_class_name}* controllee);
 \tvirtual ~{self._base_state_class_name}();
+\tvirtual void Setup(); 
 {transition_list}
 \tvirtual {self._base_state_class_name}* TryTransitWithoutEvent();
 \t

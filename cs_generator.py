@@ -46,6 +46,10 @@ abstract public class {self._base_state_class_name}
 \t{{
 \t\t_controllee = controllee;
 \t}}
+\tpublic virtual void Setup()
+\t{{
+\t\treturn;
+\t}}
 {transition_list}
 \tpublic virtual {self._base_state_class_name}? TryTransitWithoutEvent()
 \t{{
