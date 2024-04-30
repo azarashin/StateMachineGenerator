@@ -29,10 +29,10 @@ class CPPGenerator:
         ret[f'{self._console_controllee_class_name}.cpp'] = self.generate_console_out_controllee_cpp(transitions)
         ret[f'{self._console_controllee_class_name}.h'] = self.generate_console_out_controllee_h(transitions)
         ret[self._boot_program] = self.generate_sample_boot_program(transitions)
-        state_classes = self.generate_state_classes_cpp(state_dic, transitions)
+        state_classes = self.generate_state_classes_cpp(state_manager, state_dic, transitions)
         for state in state_classes:
             ret[f'{self._prefix_state}{state.name}.cpp'] = state_classes[state]
-        state_classes = self.generate_state_classes_h(state_dic, transitions)
+        state_classes = self.generate_state_classes_h(state_manager, state_dic, transitions)
         for state in state_classes:
             ret[f'{self._prefix_state}{state.name}.h'] = state_classes[state]
         return ret
@@ -310,18 +310,37 @@ public:
 """
         return ret
 
-    def generate_state_class_cpp(self, state, transitions, state_dic):
+    def generate_sub_transitions_cpp(self, state_name, event):
+        return f"""
+{self._base_state_class_name}* {self._prefix_state}{state_name}::{self._prefix_method}{event}()
+{{
+\tif(_currentState != 0)
+\t{{
+\t\treturn _currentState->{self._prefix_method}{event}();
+\t}}
+\treturn 0; 
+}}
+"""
+
+    def generate_sub_transitions_h(self, event):
+        return f"""
+\tvirtual {self._base_state_class_name}* {self._prefix_method}{event}();
+"""
+
+    def generate_state_class_cpp(self, state, state_manager, transitions, state_dic):
         target_transitions = [d for d in transitions if d.state_from == state.name]
         transition_codes = '\n'.join([self.generate_transition_cpp(state, d.event, d.action, d.state_to, state_dic) for d in sorted(target_transitions, key=lambda x: x.get_event_as_key())])
         setup_code = ""
+        sub_transition_codes = ""
         if state.initial_state:
             setup_code = f"""
 void {self._prefix_state}{state.name}::Setup()
 {{
 \t_currentState = _stateController->InstanceOf{state.initial_state}; 
-\treturn;
 }}
 """
+            sub_transitions = state_manager.get_all_transitions_under_the_state(state.name)
+            sub_transition_codes = '\n'.join([self.generate_sub_transitions_cpp(state.name, d) for d in sorted(sub_transitions, key=lambda x: x)])
         
         ret = f"""#include "{self._prefix_state}{state.name}.h"
 
@@ -336,6 +355,7 @@ void {self._prefix_state}{state.name}::Setup()
 }}
 {setup_code}
 {transition_codes}
+{sub_transition_codes}
 const char* {self._prefix_state}{state.name}::GetStateName()
 {{
 \treturn "{state.get_full_name()}"; 
@@ -343,15 +363,19 @@ const char* {self._prefix_state}{state.name}::GetStateName()
         """
         return ret
 
-    def generate_state_class_h(self, state, transitions, state_dic):
+    def generate_state_class_h(self, state, state_manager, transitions, state_dic):
         target_transitions = [d for d in transitions if d.state_from == state.name]
         transition_codes = '\n'.join([self.generate_transition_h(d.event) for d in sorted(target_transitions, key=lambda x: x.get_event_as_key())])
         description_body = ''
         setup_code = ""
         setup_description = ""
+        sub_transition_codes = ""
         if state.initial_state:
             setup_code = f"""\tvirtual void Setup(); """
             setup_description = f"\tBaseState* _currentState;"
+            sub_transitions = state_manager.get_all_transitions_under_the_state(state.name)
+            sub_transition_codes = '\n'.join([self.generate_sub_transitions_h(d) for d in sorted(sub_transitions, key=lambda x: x)])
+            
 
         if state.description is None or state.description.strip() == '':
             pass
@@ -380,16 +404,17 @@ public:
 \tvirtual ~{self._prefix_state}{state.name}();
 {setup_code}
 {transition_codes}
+{sub_transition_codes}
 \tvirtual const char* GetStateName();
 }};
         """
         return ret
 
-    def generate_state_classes_cpp(self, state_dic, transitions):
-        return {d:self.generate_state_class_cpp(d, transitions, state_dic) for d in state_dic.values()}
+    def generate_state_classes_cpp(self, state_manager, state_dic, transitions):
+        return {d:self.generate_state_class_cpp(d, state_manager, transitions, state_dic) for d in state_dic.values()}
 
-    def generate_state_classes_h(self, state_dic, transitions):
-        return {d:self.generate_state_class_h(d, transitions, state_dic) for d in state_dic.values()}
+    def generate_state_classes_h(self, state_manager, state_dic, transitions):
+        return {d:self.generate_state_class_h(d, state_manager, transitions, state_dic) for d in state_dic.values()}
 
 
 

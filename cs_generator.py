@@ -26,7 +26,7 @@ class CSGenerator:
         ret[f'{self._state_controller_class_name}.cs'] = self.generate_state_controller(state_dic, transitions, initial)
         ret[f'{self._console_controllee_class_name}.cs'] = self.generate_console_out_controllee(transitions)
         ret[self._boot_program] = self.generate_sample_boot_program(transitions)
-        state_classes = self.generate_state_classes(state_dic, transitions)
+        state_classes = self.generate_state_classes(state_manager, state_dic, transitions)
         for state in state_classes:
             ret[f'{self._prefix_state}{state.name}.cs'] = state_classes[state]
         return ret
@@ -196,7 +196,19 @@ public class {self._state_controller_class_name}
 """
         return ret
 
-    def generate_state_class(self, state, transitions, state_dic):
+    def generate_sub_transitions(self, event):
+        return f"""
+\tpublic override {self._base_state_class_name}? {self._prefix_method}{event}()
+\t{{
+\t\tif(_currentState != null)
+\t\t{{
+\t\t\treturn _currentState.{self._prefix_method}{event}();
+\t\t}}
+\t\treturn null; 
+\t}}
+"""
+
+    def generate_state_class(self, state, state_manager, transitions, state_dic):
         target_transitions = [d for d in transitions if d.state_from == state.name]
         transition_codes = '\n'.join([self.generate_transition(d.event, d.action, d.state_to, state_dic) for d in sorted(target_transitions, key=lambda x: x.get_event_as_key())])
         description_body = ''
@@ -211,6 +223,7 @@ public class {self._state_controller_class_name}
             description_body += '/// </summary>\n'
         setup_code = ""
         setup_description = ""
+        sub_transition_codes = ""
         if state.initial_state:
             setup_code = f"""
 \tpublic override void Setup()
@@ -219,7 +232,10 @@ public class {self._state_controller_class_name}
 \t\treturn;
 \t}}
 """
-            setup_description = f"""\tprivate BaseState? _currentState; """
+            setup_description = f"""\tprivate {self._base_state_class_name}? _currentState; """
+            sub_transitions = state_manager.get_all_transitions_under_the_state(state.name)
+            sub_transition_codes = '\n'.join([self.generate_sub_transitions(d) for d in sorted(sub_transitions, key=lambda x: x)])
+
         
         ret = f"""
 {description_body}
@@ -235,6 +251,7 @@ public class {self._prefix_state}{state.name} : {self._base_state_class_name}
 \t}}
 {setup_code}
 {transition_codes}
+{sub_transition_codes}
 \tpublic override string GetStateName()
 \t{{
 \t\treturn "{state.get_full_name()}"; 
@@ -243,8 +260,8 @@ public class {self._prefix_state}{state.name} : {self._base_state_class_name}
         """
         return ret
 
-    def generate_state_classes(self, state_dic, transitions):
-        return {d:self.generate_state_class(d, transitions, state_dic) for d in state_dic.values()}
+    def generate_state_classes(self, state_manager, state_dic, transitions):
+        return {d:self.generate_state_class(d, state_manager, transitions, state_dic) for d in state_dic.values()}
 
 
 
