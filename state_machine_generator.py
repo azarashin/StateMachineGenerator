@@ -29,10 +29,7 @@ class StateMachineGenerator:
         if lines[-1] != '@enduml':
             return (False, 'end of puml does not match to @enduml.')
         state_manager = StateManager(puml_body)
-        state_dic = state_manager.get_state_dic()
-        transitions = state_manager.get_transitions()
-        initial = state_manager.get_initial()
-        files = generator.generate_files(state_dic, transitions, initial)
+        files = generator.generate_files(state_manager)
         files = {d: files[d].replace('\t', self._tab) for d in files}
         return files
 

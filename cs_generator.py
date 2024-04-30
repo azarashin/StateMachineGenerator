@@ -15,7 +15,11 @@ class CSGenerator:
         self._state_controller_class_name = state_controller_class_name
         self._console_controllee_class_name = console_controllee_class_name
 
-    def generate_files(self, state_dic, transitions, initial):
+    def generate_files(self, state_manager):
+        state_dic = state_manager.get_state_dic()
+        transitions = state_manager.get_transitions()
+        initial = state_manager.get_initial()
+
         ret = {}
         ret[f'{self._icontrollee_class_name}.cs'] = self.generate_controllee_interface(transitions)
         ret[f'{self._base_state_class_name}.cs'] = self.generate_base_state(transitions)
