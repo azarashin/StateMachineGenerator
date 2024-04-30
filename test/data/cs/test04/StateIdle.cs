@@ -7,12 +7,6 @@ public class StateIdle : BaseState
         _stateController = stateController;
         _controllee = controllee;
     }
-    public override BaseState? TransitEscape()
-    {
-        _controllee.DoAction3();
-        _stateController.InstanceOfEscaped.Setup();
-        return _stateController.InstanceOfEscaped; 
-    }
     public override BaseState? TransitEvConfig()
     {
         _controllee.DoAction1();

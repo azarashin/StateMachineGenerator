@@ -11,7 +11,6 @@ private:
 public:
     StateIdle(StateController* stateController, IControllee* controllee);
     virtual ~StateIdle();
-    virtual BaseState* TransitEscape();
     virtual BaseState* TransitEvConfig();
     virtual const char* GetStateName();
 };

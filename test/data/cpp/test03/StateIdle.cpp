@@ -8,12 +8,6 @@ StateIdle::StateIdle(StateController* stateController, IControllee* controllee) 
 StateIdle::~StateIdle()
 {
 }
-BaseState* StateIdle::TransitEscape()
-{
-    _controllee->DoAction3();
-    _stateController->InstanceOfEscaped->Setup();
-    return _stateController->InstanceOfEscaped;
-}
 BaseState* StateIdle::TransitEvConfig()
 {
     _controllee->DoAction1();
