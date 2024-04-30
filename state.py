@@ -101,3 +101,11 @@ class StateManager:
     def get_parent_list(self):
         return list(set([self._dic[d].parent for d in self._dic if self._dic[d].parent is not None]))
     
+    def get_all_transitions_under_the_state(self, state):
+        ret = []
+        children = [d.name for d in self._get_children(self._dic[state])]
+        transitions = [d for d in self._transitions if d.state_from and d.event and d.state_from in children]
+        for transition in transitions:
+            if not transition.event in ret:
+                    ret.append(transition.event)
+        return ret
