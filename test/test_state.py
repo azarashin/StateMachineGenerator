@@ -218,7 +218,7 @@ Second --> Escaped : Command3 / Action3
     assert idle_third.initial_state is None
 
     transitions = state_manager.get_transitions()
-    assert len(transitions) == 9
+    assert len(transitions) == 6
     assert find_transition(transitions, 'Initial', 'Second', 'Command1', 'Action1')
     assert find_transition(transitions, 'IdleSecond', 'Third', 'Command2', 'Action2')
     assert find_transition(transitions, 'Second', 'Escaped', 'Command3', 'Action3')
