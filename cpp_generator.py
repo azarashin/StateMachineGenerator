@@ -286,8 +286,10 @@ public:
         next_state = self.actual_next_state(next_state, state_dic)
             
         if next_state == "[*]":
+            setup_sequence = ""
             next_state_sequence = "\treturn 0;"
         else:
+            setup_sequence = f'\t_stateController->{self._prefix_instance_of}{next_state}->Setup();'
             next_state_sequence = f"\treturn _stateController->{self._prefix_instance_of}{next_state};"
         transition_name = f'{self._prefix_method}{event}'
         if event is None:
@@ -296,6 +298,7 @@ public:
 {self._base_state_class_name}* {self._prefix_state}{state.name}::{transition_name}()
 {{
 {action_sequence}
+{setup_sequence}
 {next_state_sequence}
 }}
 """

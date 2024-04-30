@@ -180,8 +180,10 @@ public class {self._state_controller_class_name}
         next_state = self.actual_next_state(next_state, state_dic)
             
         if next_state == "[*]":
+            setup_sequence = ""
             next_state_sequence = "\t\treturn null;"
         else:
+            setup_sequence = f'\t\t_stateController.{self._prefix_instance_of}{next_state}.Setup();'
             next_state_sequence = f"\t\treturn _stateController.{self._prefix_instance_of}{next_state};"
         transition_name = f'{self._prefix_method}{event}'
         if event is None:
@@ -190,6 +192,7 @@ public class {self._state_controller_class_name}
 \tpublic override {self._base_state_class_name}? {transition_name}()
 \t{{
 {action_sequence}
+{setup_sequence}
 {next_state_sequence}
 \t}}
 """
