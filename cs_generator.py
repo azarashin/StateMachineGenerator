@@ -205,6 +205,17 @@ public class {self._state_controller_class_name}
                 if description.strip() != '':
                     description_body += f'/// {description.strip()}\n'
             description_body += '/// </summary>\n'
+        setup_code = ""
+        setup_description = ""
+        if state.initial_state:
+            setup_code = f"""
+\tpublic override void Setup()
+\t{{
+\t\t_currentState = _stateController.InstanceOf{state.initial_state}; 
+\t\treturn;
+\t}}
+"""
+            setup_description = f"""\tprivate BaseState? _currentState; """
         
         ret = f"""
 {description_body}
@@ -212,11 +223,13 @@ public class {self._prefix_state}{state.name} : {self._base_state_class_name}
 {{
 \tprivate {self._state_controller_class_name} _stateController; 
 \tprivate {self._icontrollee_class_name} _controllee; 
+{setup_description}
 \tpublic {self._prefix_state}{state.name}({self._state_controller_class_name} stateController, {self._icontrollee_class_name} controllee) : base(controllee)
 \t{{
 \t\t_stateController = stateController;
 \t\t_controllee = controllee;
 \t}}
+{setup_code}
 {transition_codes}
 \tpublic override string GetStateName()
 \t{{

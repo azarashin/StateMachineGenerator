@@ -309,6 +309,15 @@ public:
     def generate_state_class_cpp(self, state, transitions, state_dic):
         target_transitions = [d for d in transitions if d.state_from == state.name]
         transition_codes = '\n'.join([self.generate_transition_cpp(state, d.event, d.action, d.state_to, state_dic) for d in sorted(target_transitions, key=lambda x: x.get_event_as_key())])
+        setup_code = ""
+        if state.initial_state:
+            setup_code = f"""
+void {self._prefix_state}{state.name}::Setup()
+{{
+\t_currentState = _stateController->InstanceOf{state.initial_state}; 
+\treturn;
+}}
+"""
         
         ret = f"""#include "{self._prefix_state}{state.name}.h"
 
@@ -321,6 +330,7 @@ public:
 {{
     
 }}
+{setup_code}
 {transition_codes}
 const char* {self._prefix_state}{state.name}::GetStateName()
 {{
@@ -333,6 +343,12 @@ const char* {self._prefix_state}{state.name}::GetStateName()
         target_transitions = [d for d in transitions if d.state_from == state.name]
         transition_codes = '\n'.join([self.generate_transition_h(d.event) for d in sorted(target_transitions, key=lambda x: x.get_event_as_key())])
         description_body = ''
+        setup_code = ""
+        setup_description = ""
+        if state.initial_state:
+            setup_code = f"""\tvirtual void Setup(); """
+            setup_description = f"\tBaseState* _currentState;"
+
         if state.description is None or state.description.strip() == '':
             pass
         else:
@@ -354,9 +370,11 @@ class {self._prefix_state}{state.name} : public {self._base_state_class_name}
 private:
 \t{self._state_controller_class_name}* _stateController; 
 \t{self._icontrollee_class_name}* _controllee; 
+{setup_description}
 public:
 \t{self._prefix_state}{state.name}({self._state_controller_class_name}* stateController, {self._icontrollee_class_name}* controllee);
 \tvirtual ~{self._prefix_state}{state.name}();
+{setup_code}
 {transition_codes}
 \tvirtual const char* GetStateName();
 }};
