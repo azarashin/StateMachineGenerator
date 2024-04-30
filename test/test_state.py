@@ -194,12 +194,12 @@ Second --> Escaped : Command3 / Action3
 
     assert second.name == 'Second'
     assert second.parent is None
-    assert len(second.children) == 2
+    assert len(second.children) == 2 # Third, IdleSecond
     assert second.initial_state == 'IdleSecond'
 
     assert third.name == 'Third'
     assert third.parent == second
-    assert len(third.children) == 1
+    assert len(third.children) == 1 # IdleThird
     assert third.initial_state == 'IdleThird'
 
     assert escaped.name == 'Escaped'
