@@ -316,7 +316,8 @@ public:
 {{
 \tif(_currentState != 0)
 \t{{
-\t\treturn _currentState->{self._prefix_method}{event}();
+\t\t_currentState = _currentState->{self._prefix_method}{event}();
+\t\treturn this; 
 \t}}
 \treturn 0; 
 }}

@@ -202,7 +202,8 @@ public class {self._state_controller_class_name}
 \t{{
 \t\tif(_currentState != null)
 \t\t{{
-\t\t\treturn _currentState.{self._prefix_method}{event}();
+\t\t\t_currentState = _currentState.{self._prefix_method}{event}();
+\t\t\treturn this; 
 \t\t}}
 \t\treturn null; 
 \t}}
