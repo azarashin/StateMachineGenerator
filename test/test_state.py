@@ -132,12 +132,12 @@ NotShooting --> Escaped : Escape / Action3
     assert initial.initial_state is None
 
     assert idle.name == 'Idle'
-    assert idle.parent == not_shooting
+    assert idle.parent is None
     assert len(idle.children) == 0
     assert idle.initial_state is None
 
     assert configuring.name == 'Configuring'
-    assert configuring.parent == not_shooting
+    assert configuring.parent is None
     assert len(configuring.children) == 0
     assert configuring.initial_state is None
 
@@ -222,9 +222,9 @@ Second --> Escaped : Command3 / Action3
     assert find_transition(transitions, 'Initial', 'Second', 'Command1', 'Action1')
     assert find_transition(transitions, 'IdleSecond', 'Third', 'Command2', 'Action2')
     assert find_transition(transitions, 'Second', 'Escaped', 'Command3', 'Action3')
-    assert find_transition(transitions, 'IdleSecond', 'Escaped', 'Command3', 'Action3')
-    assert find_transition(transitions, 'Third', 'Escaped', 'Command3', 'Action3')
-    assert find_transition(transitions, 'IdleThird', 'Escaped', 'Command3', 'Action3')
+    assert not find_transition(transitions, 'IdleSecond', 'Escaped', 'Command3', 'Action3')
+    assert not find_transition(transitions, 'Third', 'Escaped', 'Command3', 'Action3')
+    assert not find_transition(transitions, 'IdleThird', 'Escaped', 'Command3', 'Action3')
     assert find_transition(transitions, None, 'Initial', None, None)
     assert find_transition(transitions, None, 'IdleSecond', None, None)
     assert find_transition(transitions, None, 'IdleThird', None, None)
