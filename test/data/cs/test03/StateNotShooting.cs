@@ -29,6 +29,6 @@ public class StateNotShooting : BaseState
     }
     public override string GetStateName()
     {
-        return "Initial"; 
+        return "NotShooting"; 
     }
 }
