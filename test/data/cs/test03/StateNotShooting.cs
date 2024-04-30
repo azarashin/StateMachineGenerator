@@ -23,7 +23,8 @@ public class StateNotShooting : BaseState
     {
         if(_currentState != null)
         {
-            return _currentState.TransitEvConfig();
+            _currentState = _currentState.TransitEvConfig();
+            return this; 
         }
         return null; 
     }

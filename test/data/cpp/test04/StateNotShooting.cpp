@@ -22,7 +22,8 @@ BaseState* StateNotShooting::TransitEvConfig()
 {
     if(_currentState != 0)
     {
-        return _currentState->TransitEvConfig(); 
+        _currentState = _currentState->TransitEvConfig(); 
+        return this; 
     }
     return 0; 
 }
