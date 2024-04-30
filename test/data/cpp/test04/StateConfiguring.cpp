@@ -8,12 +8,6 @@ StateConfiguring::StateConfiguring(StateController* stateController, IControllee
 StateConfiguring::~StateConfiguring()
 {
 }
-BaseState* StateConfiguring::TransitEscape()
-{
-    _controllee->DoAction3();
-    _stateController->InstanceOfEscaped->Setup();
-    return _stateController->InstanceOfEscaped;
-}
 BaseState* StateConfiguring::TransitEvConfig()
 {
     _controllee->DoAction2();

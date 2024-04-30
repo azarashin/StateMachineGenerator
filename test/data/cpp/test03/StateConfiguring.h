@@ -11,7 +11,6 @@ private:
 public:
     StateConfiguring(StateController* stateController, IControllee* controllee);
     virtual ~StateConfiguring();
-    virtual BaseState* TransitEscape();
     virtual BaseState* TransitEvConfig();
     virtual const char* GetStateName();
 };
