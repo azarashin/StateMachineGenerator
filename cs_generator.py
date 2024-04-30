@@ -120,7 +120,7 @@ public class {self._console_controllee_class_name} : {self._icontrollee_class_na
 """
 
     def generate_state_controller(self, state_dic, transitions, initial):
-        states = [d for d in state_dic.values() if len(d.children) == 0]
+        states = [d for d in state_dic.values()]
         state_declarations = '\n'.join([self.state_declaration(d) for d in sorted(states, key=lambda x: x.name)])
         set_state_declarations = '\n'.join([self.setup_state_declaration(d) for d in sorted(states, key=lambda x: x.name)])
         event_transitions = sorted(list(set([d.event for d in transitions if d.event is not None])))
