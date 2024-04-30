@@ -228,3 +228,59 @@ Second --> Escaped : Command3 / Action3
     assert find_transition(transitions, None, 'Initial', None, None)
     assert find_transition(transitions, None, 'IdleSecond', None, None)
     assert find_transition(transitions, None, 'IdleThird', None, None)
+
+def test_state_05():
+    source = """@startuml
+[*] --> Initial
+
+Initial --> Second : Command1 / Action1
+
+state Second {
+  [*] --> IdleSecond
+  state Third {
+    [*] --> BootThird
+    BootThird --> IdleThird : Command4 / Action4
+  }
+  IdleSecond --> Third : Command2 / Action2
+}
+
+Second --> Escaped : Command3 / Action3
+
+@enduml
+"""
+    state_manager = StateManager(source)
+    state_list = state_manager.get_state_dic().keys()
+
+    assert len(state_list) == 7
+    assert 'Initial' in state_list
+    assert 'Second' in state_list
+    assert 'Third' in state_list
+    assert 'Escaped' in state_list
+    assert 'IdleSecond' in state_list
+    assert 'BootThird' in state_list
+    assert 'IdleThird' in state_list
+
+
+    transition_symbols = state_manager.get_all_transitions_under_the_state('Initial')
+    assert len(transition_symbols) == 0
+
+    transition_symbols = state_manager.get_all_transitions_under_the_state('Escaped')
+    assert len(transition_symbols) == 0
+
+    transition_symbols = state_manager.get_all_transitions_under_the_state('IdleSecond')
+    assert len(transition_symbols) == 0
+
+    transition_symbols = state_manager.get_all_transitions_under_the_state('BootThird')
+    assert len(transition_symbols) == 0
+
+    transition_symbols = state_manager.get_all_transitions_under_the_state('IdleThird')
+    assert len(transition_symbols) == 0
+
+    transition_symbols = state_manager.get_all_transitions_under_the_state('Second')
+    assert len(transition_symbols) == 2
+    assert 'Command2' in transition_symbols
+    assert 'Command4' in transition_symbols
+
+    transition_symbols = state_manager.get_all_transitions_under_the_state('Third')
+    assert len(transition_symbols) == 1
+    assert 'Command4' in transition_symbols
