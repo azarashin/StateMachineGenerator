@@ -73,7 +73,7 @@ class StateManager:
         if name != '[*]' and not name in self._dic:
             self._dic[name] = State(name, parent)
         if name in self._dic and self._dic[name].parent is None:
-            self._dic[name].parent = parent
+            pass # self._dic[name].parent will not be overwritten by parent. 
         if name in self._dic:
             return self._dic[name]
         return None
