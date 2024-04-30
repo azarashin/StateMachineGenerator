@@ -167,17 +167,11 @@ public class {self._state_controller_class_name}
 """
         return ret
     
-    def actual_next_state(self, state, state_dic):
-        if not state in state_dic or state_dic[state].initial_state is None:
-            return state
-        return self.actual_next_state(state_dic[state].initial_state, state_dic)
-    
     def generate_transition(self, event, action, next_state, state_dic):
         if action is None:
             action_sequence = ""
         else:
             action_sequence = f"\t\t_controllee.{self._prefix_action_method}{action}();"
-        next_state = self.actual_next_state(next_state, state_dic)
             
         if next_state == "[*]":
             setup_sequence = ""

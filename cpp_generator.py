@@ -198,7 +198,7 @@ public:
 """
 
     def generate_state_controller_cpp(self, state_dic, transitions, initial):
-        states = [d for d in state_dic.values() if len(d.children) == 0]
+        states = [d for d in state_dic.values()]
         set_state_declarations = '\n'.join([self.setup_state_declaration(d) for d in sorted(states, key=lambda x: x.name)])
         delete_states = '\n'.join([self.delete_state_declaration(d) for d in sorted(states, key=lambda x: x.name)])
 
@@ -242,7 +242,7 @@ const char* {self._state_controller_class_name}::GetCurrentStateName()
 
 
     def generate_state_controller_h(self, state_dic, transitions, initial):
-        states = [d for d in state_dic.values() if len(d.children) == 0]
+        states = [d for d in state_dic.values()]
         state_declarations = '\n'.join([self.state_declaration(d) for d in sorted(states, key=lambda x: x.name)])
         state_include =  '\n'.join([self.state_include(d) for d in sorted(states, key=lambda x: x.name)])
 
@@ -272,18 +272,11 @@ public:
 """
         return ret
     
-    
-    def actual_next_state(self, state, state_dic):
-        if not state in state_dic or state_dic[state].initial_state is None:
-            return state
-        return self.actual_next_state(state_dic[state].initial_state, state_dic)
-    
     def generate_transition_cpp(self, state, event, action, next_state, state_dic):
         if action is None:
             action_sequence = ""
         else:
             action_sequence = f"\t_controllee->{self._prefix_action_method}{action}();"
-        next_state = self.actual_next_state(next_state, state_dic)
             
         if next_state == "[*]":
             setup_sequence = ""
