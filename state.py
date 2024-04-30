@@ -87,19 +87,10 @@ class StateManager:
         return None
     
     def get_transitions(self):
-        return self._transitions + self._get_inherited_transitions()
+        return self._transitions
     
     def get_initial(self):
         return self.initial_state
-    
-    def _get_inherited_transitions(self):
-        ret = []
-        for transition in self._transitions:
-            if transition.state_from:
-                start = self._dic[transition.state_from]
-                children = self._get_children(start)
-                ret += [Transition(d.name, transition.state_to, transition.transition_type, transition.event, transition.action) for d in children]
-        return ret
 
     def _get_children(self, parent):
         ret = [] + parent.children
@@ -109,4 +100,4 @@ class StateManager:
     
     def get_parent_list(self):
         return list(set([self._dic[d].parent for d in self._dic if self._dic[d].parent is not None]))
-            
+    
