@@ -19,12 +19,22 @@ BaseState* StateNotShooting::TransitEscape()
 }
 BaseState* StateNotShooting::TransitEvConfig()
 {
-    if(_currentState != 0)
+    if(_currentState == 0)
     {
-        _currentState = _currentState->TransitEvConfig();
+        return 0;
+    }
+    BaseState* nextState = _currentState->TransitEvConfig();
+    if(nextState == 0)
+    {
+        return nextState;
+    }
+    BaseState* parentOfNextState = _currentState->GetParent();
+    BaseState* parentOfCurrentState = nextState->GetParent();
+    if(parentOfNextState != 0 && parentOfCurrentState != 0 && parentOfNextState == parentOfCurrentState)
+    {
         return this;
     }
-    return 0;
+    return nextState;
 }
 const char* StateNotShooting::GetStateName()
 {
