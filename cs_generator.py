@@ -201,12 +201,22 @@ public class {self._state_controller_class_name}
         return f"""
 \tpublic override {self._base_state_class_name}? {self._prefix_method}{event}()
 \t{{
-\t\tif(_currentState != null)
+\t\tif(_currentState == null)
 \t\t{{
-\t\t\t_currentState = _currentState.{self._prefix_method}{event}();
+\t\t\treturn null; 
+\t\t}}
+\t\t{self._base_state_class_name}? nextState = _currentState.{self._prefix_method}{event}();
+\t\tif(nextState == null)
+\t\t{{
+\t\t\treturn nextState; 
+\t\t}}
+\t\t{self._base_state_class_name}? parentOfNextState = _currentState.GetParent();
+\t\t{self._base_state_class_name}? parentOfCurrentState = nextState.GetParent();
+\t\tif(parentOfNextState is not null && parentOfCurrentState is not null && parentOfNextState == parentOfCurrentState)
+\t\t{{
 \t\t\treturn this; 
 \t\t}}
-\t\treturn null; 
+\t\treturn nextState;
 \t}}
 """
 
