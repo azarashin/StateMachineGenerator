@@ -355,6 +355,7 @@ const char* {self._prefix_state}{state.name}::GetStateName()
 void {self._prefix_state}{state.name}::Setup()
 {{
 \t_currentState = _stateController->InstanceOf{state.initial_state}; 
+\t_currentState->Setup(); 
 }}
 """
             sub_transitions = state_manager.get_all_transitions_under_the_state(state.name)
@@ -394,7 +395,7 @@ const char* {self._prefix_state}{state.name}::GetStateName()
 {{
 \treturn {parent};
 }}
-        """
+"""
         return ret
 
     def generate_state_class_h(self, state, state_manager, transitions, state_dic):
