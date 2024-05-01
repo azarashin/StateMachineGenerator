@@ -1,0 +1,25 @@
+@startuml
+
+[*] --> State1
+
+
+state State2 {
+  state State21 {
+    [*] --> State31
+  }
+
+  [*] --> State21
+}
+
+State1 --> State31 : Event31 / Action31
+State1 --> State21 : Event21 / Action21
+State1 --> State2 : Event2 / Action2
+
+State31 --> State4 : Event431 / Action431
+State21 --> State4 : Event421 / Action421
+State2 --> State4 : Event42 / Action42
+
+
+
+
+@enduml
