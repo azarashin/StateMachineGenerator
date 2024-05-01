@@ -30,7 +30,11 @@ public class StateNotShooting : BaseState
     }
     public override string GetStateName()
     {
-        return "NotShooting"; 
+        if(_currentState == null)
+        {
+            return "NotShooting(end)";
+        }
+        return _currentState.GetStateName();
     }
     public override BaseState? GetParent()
     {
