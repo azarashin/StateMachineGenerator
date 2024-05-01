@@ -9,8 +9,7 @@ StateNotShooting::~StateNotShooting()
 }
 void StateNotShooting::Setup()
 {
-    _currentState = _stateController->InstanceOfIdle;
-    _currentState->Setup();
+        SetupSubState(_stateController->InstanceOfIdle);
 }
 BaseState* StateNotShooting::TransitEscape()
 {
@@ -20,30 +19,22 @@ BaseState* StateNotShooting::TransitEscape()
 }
 BaseState* StateNotShooting::TransitEvConfig()
 {
-    if(_currentState == 0)
+    BaseState* currentSubState = CurrentSubState();
+    if(currentSubState != 0)
     {
-        return 0;
+        BaseState* nextState = currentSubState->TransitEvConfig();
+        return TransitBySubState(nextState);
     }
-    BaseState* nextState = _currentState->TransitEvConfig();
-    if(nextState == 0)
-    {
-        return nextState;
-    }
-    BaseState* parentOfNextState = _currentState->GetParent();
-    BaseState* parentOfCurrentState = nextState->GetParent();
-    if(parentOfNextState != 0 && parentOfCurrentState != 0 && parentOfNextState == parentOfCurrentState)
-    {
-        return this;
-    }
-    return nextState;
+    return 0;
 }
 const char* StateNotShooting::GetStateName()
 {
-    if(_currentState == 0)
+    BaseState* currentSubState = CurrentSubState();
+    if(currentSubState == 0)
     {
         return "NotShooting(end)";
     }
-    return _currentState->GetStateName();
+    return currentSubState->GetStateName();
 }
 BaseState* StateNotShooting::GetParent()
 {
