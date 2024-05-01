@@ -92,6 +92,7 @@ public:
 \tvirtual {self._base_state_class_name}* TryTransitWithoutEvent();
 \t
 \tvirtual const char* GetStateName() = 0;
+\tvirtual {self._base_state_class_name}* GetParent() = 0;
 }};
         """
         return ret
@@ -342,6 +343,11 @@ void {self._prefix_state}{state.name}::Setup()
 """
             sub_transitions = state_manager.get_all_transitions_under_the_state(state.name)
             sub_transition_codes = '\n'.join([self.generate_sub_transitions_cpp(state.name, d) for d in sorted(sub_transitions, key=lambda x: x)])
+
+        if state.parent:
+            parent = f'_stateController->{self._prefix_instance_of}{state.parent.name}'
+        else:
+            parent = '0'
         
         ret = f"""#include "{self._prefix_state}{state.name}.h"
 
@@ -358,8 +364,10 @@ void {self._prefix_state}{state.name}::Setup()
 {transition_codes}
 {sub_transition_codes}
 const char* {self._prefix_state}{state.name}::GetStateName()
+{self._base_state_class_name}* {self._prefix_state}{state.name}::GetParent()
 {{
 \treturn "{state.get_full_name()}"; 
+\treturn {parent};
 }}
         """
         return ret
@@ -407,6 +415,7 @@ public:
 {transition_codes}
 {sub_transition_codes}
 \tvirtual const char* GetStateName();
+\tvirtual {self._base_state_class_name}* GetParent();
 }};
         """
         return ret
