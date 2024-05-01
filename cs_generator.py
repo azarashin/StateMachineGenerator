@@ -46,6 +46,7 @@ class CSGenerator:
 abstract public class {self._base_state_class_name}
 {{
 \tprivate {self._icontrollee_class_name} _controllee; 
+\tprivate {self._base_state_class_name}? _currentSubState;
 \tpublic {self._base_state_class_name}({self._icontrollee_class_name} controllee)
 \t{{
 \t\t_controllee = controllee;
@@ -59,8 +60,41 @@ abstract public class {self._base_state_class_name}
 \t{{
 \t\treturn this;
 \t}}
+\tpublic void SetupSubState(BaseState child)
+\t{{
+\t\t_currentSubState = child; 
+\t\t_currentSubState.Setup();
+\t}}
+\tpublic {self._base_state_class_name}? CurrentSubState()
+\t{{
+\t\treturn _currentSubState;
+\t}}
+\tpublic {self._base_state_class_name}? TransitBySubState({self._base_state_class_name}? nextState)
+\t{{
+\t\tif(nextState == null || _currentSubState == null)
+\t\t{{
+\t\t\treturn nextState;
+\t\t}}
+\t\tBaseState? parentOfNextState = _currentSubState.GetParent();
+\t\tBaseState? parentOfCurrentState = nextState.GetParent();
+\t\tif(parentOfNextState is not null && parentOfCurrentState is not null && parentOfNextState == parentOfCurrentState)
+\t\t{{
+\t\t\t_currentSubState = nextState;
+\t\t\treturn this;
+\t\t}}
+\t\treturn nextState;
+\t}}
+\tpublic void TransitForChild(BaseState? child)
+\t{{
+\t\t_currentSubState = child;
+\t\tBaseState? parent = GetParent();
+\t\tif(parent != null)
+\t\t{{
+\t\t\tparent.TransitForChild(this);
+\t\t}}
+\t}}
 \tpublic abstract string GetStateName();
-\tpublic abstract BaseState? GetParent(); 
+\tpublic abstract BaseState? GetParent();
 }}
         """
         return ret
@@ -201,22 +235,13 @@ public class {self._state_controller_class_name}
         return f"""
 \tpublic override {self._base_state_class_name}? {self._prefix_method}{event}()
 \t{{
-\t\tif(_currentState == null)
+\t\tBaseState? currentSubState = CurrentSubState();
+\t\tif(currentSubState != null)
 \t\t{{
-\t\t\treturn null; 
+\t\t\t{self._base_state_class_name}? nextState = currentSubState.{self._prefix_method}{event}();
+\t\t\treturn TransitBySubState(nextState);
 \t\t}}
-\t\t{self._base_state_class_name}? nextState = _currentState.{self._prefix_method}{event}();
-\t\tif(nextState == null)
-\t\t{{
-\t\t\treturn nextState; 
-\t\t}}
-\t\t{self._base_state_class_name}? parentOfNextState = _currentState.GetParent();
-\t\t{self._base_state_class_name}? parentOfCurrentState = nextState.GetParent();
-\t\tif(parentOfNextState is not null && parentOfCurrentState is not null && parentOfNextState == parentOfCurrentState)
-\t\t{{
-\t\t\treturn this; 
-\t\t}}
-\t\treturn nextState;
+\t\treturn null; 
 \t}}
 """
 
@@ -234,7 +259,6 @@ public class {self._state_controller_class_name}
                     description_body += f'/// {description.strip()}\n'
             description_body += '/// </summary>\n'
         setup_code = ""
-        setup_description = ""
         sub_transition_codes = ""
         state_name = f"""
 \tpublic override string GetStateName()
@@ -246,22 +270,20 @@ public class {self._state_controller_class_name}
             setup_code = f"""
 \tpublic override void Setup()
 \t{{
-\t\t_currentState = _stateController.InstanceOf{state.initial_state}; 
-\t\t_currentState.Setup();
-\t\treturn;
+\t\tSetupSubState(_stateController.InstanceOf{state.initial_state});
 \t}}
 """
-            setup_description = f"""\tprivate {self._base_state_class_name}? _currentState; """
             sub_transitions = state_manager.get_all_transitions_under_the_state(state.name)
             sub_transition_codes = '\n'.join([self.generate_sub_transitions(d) for d in sorted(sub_transitions, key=lambda x: x)])
             state_name = f"""
 \tpublic override string GetStateName()
 \t{{
-\t\tif(_currentState == null)
+\t\t{self._base_state_class_name}? currentSubState = CurrentSubState();
+\t\tif(currentSubState == null)
 \t\t{{
 \t\t\treturn "{state.get_full_name()}(end)";
 \t\t}}
-\t\treturn _currentState.GetStateName(); 
+\t\treturn currentSubState.GetStateName(); 
 \t}}
 """
 
@@ -277,7 +299,6 @@ public class {self._prefix_state}{state.name} : {self._base_state_class_name}
 {{
 \tprivate {self._state_controller_class_name} _stateController; 
 \tprivate {self._icontrollee_class_name} _controllee; 
-{setup_description}
 \tpublic {self._prefix_state}{state.name}({self._state_controller_class_name} stateController, {self._icontrollee_class_name} controllee) : base(controllee)
 \t{{
 \t\t_stateController = stateController;
