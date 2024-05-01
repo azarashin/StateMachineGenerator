@@ -10,6 +10,7 @@ StateNotShooting::~StateNotShooting()
 void StateNotShooting::Setup()
 {
     _currentState = _stateController->InstanceOfIdle;
+    _currentState->Setup();
 }
 BaseState* StateNotShooting::TransitEscape()
 {
