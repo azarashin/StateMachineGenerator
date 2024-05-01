@@ -334,6 +334,12 @@ public:
         transition_codes = '\n'.join([self.generate_transition_cpp(state, d.event, d.action, d.state_to, state_dic) for d in sorted(target_transitions, key=lambda x: x.get_event_as_key())])
         setup_code = ""
         sub_transition_codes = ""
+        state_name = f"""
+const char* {self._prefix_state}{state.name}::GetStateName()
+{{
+\treturn "{state.get_full_name()}"; 
+}}
+"""
         if state.initial_state:
             setup_code = f"""
 void {self._prefix_state}{state.name}::Setup()
@@ -343,6 +349,16 @@ void {self._prefix_state}{state.name}::Setup()
 """
             sub_transitions = state_manager.get_all_transitions_under_the_state(state.name)
             sub_transition_codes = '\n'.join([self.generate_sub_transitions_cpp(state.name, d) for d in sorted(sub_transitions, key=lambda x: x)])
+            state_name = f"""
+const char* {self._prefix_state}{state.name}::GetStateName()
+{{
+\tif(_currentState == 0)
+\t{{
+\t\treturn "{state.get_full_name()}(end)";
+\t}}
+\treturn _currentState->GetStateName(); 
+}}
+"""
 
         if state.parent:
             parent = f'_stateController->{self._prefix_instance_of}{state.parent.name}'
@@ -363,10 +379,9 @@ void {self._prefix_state}{state.name}::Setup()
 {setup_code}
 {transition_codes}
 {sub_transition_codes}
-const char* {self._prefix_state}{state.name}::GetStateName()
+{state_name}
 {self._base_state_class_name}* {self._prefix_state}{state.name}::GetParent()
 {{
-\treturn "{state.get_full_name()}"; 
 \treturn {parent};
 }}
         """
