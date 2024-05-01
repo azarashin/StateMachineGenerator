@@ -2,7 +2,6 @@ public class StateNotShooting : BaseState
 {
     private StateController _stateController;
     private IControllee _controllee;
-    private BaseState? _currentState;
     public StateNotShooting(StateController stateController, IControllee controllee) : base(controllee)
     {
         _stateController = stateController;
@@ -10,9 +9,7 @@ public class StateNotShooting : BaseState
     }
     public override void Setup()
     {
-        _currentState = _stateController.InstanceOfIdle;
-        _currentState.Setup();
-        return;
+        SetupSubState(_stateController.InstanceOfIdle);
     }
     public override BaseState? TransitEscape()
     {
@@ -22,30 +19,22 @@ public class StateNotShooting : BaseState
     }
     public override BaseState? TransitEvConfig()
     {
-        if(_currentState == null)
+        BaseState? currentSubState = CurrentSubState();
+        if(currentSubState != null)
         {
-            return null;
+            BaseState? nextState = currentSubState.TransitEvConfig();
+            return TransitBySubState(nextState);
         }
-        BaseState? nextState = _currentState.TransitEvConfig();
-        if(nextState == null)
-        {
-            return nextState;
-        }
-        BaseState? parentOfNextState = _currentState.GetParent();
-        BaseState? parentOfCurrentState = nextState.GetParent();
-        if(parentOfNextState is not null && parentOfCurrentState is not null && parentOfNextState == parentOfCurrentState)
-        {
-            return this;
-        }
-        return nextState;
+        return null;
     }
     public override string GetStateName()
     {
-        if(_currentState == null)
+        BaseState? currentSubState = CurrentSubState();
+        if(currentSubState == null)
         {
             return "NotShooting(end)";
         }
-        return _currentState.GetStateName();
+        return currentSubState.GetStateName();
     }
     public override BaseState? GetParent()
     {
