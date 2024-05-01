@@ -60,6 +60,7 @@ abstract public class {self._base_state_class_name}
 \t\treturn this;
 \t}}
 \tpublic abstract string GetStateName();
+\tpublic abstract BaseState? GetParent(); 
 }}
         """
         return ret
@@ -237,6 +238,11 @@ public class {self._state_controller_class_name}
             sub_transitions = state_manager.get_all_transitions_under_the_state(state.name)
             sub_transition_codes = '\n'.join([self.generate_sub_transitions(d) for d in sorted(sub_transitions, key=lambda x: x)])
 
+        if state.parent:
+            parent = f'_stateController.{self._prefix_instance_of}{state.parent.name}'
+        else:
+            parent = 'null'
+        
         
         ret = f"""
 {description_body}
@@ -254,8 +260,10 @@ public class {self._prefix_state}{state.name} : {self._base_state_class_name}
 {transition_codes}
 {sub_transition_codes}
 \tpublic override string GetStateName()
+\tpublic override BaseState? GetParent()
 \t{{
 \t\treturn "{state.get_full_name()}"; 
+\t\treturn {parent}; 
 \t}}
 }}
         """
