@@ -124,7 +124,7 @@ def test_cs_generator_03_10():
     istate = open('./test/data/cs/test03/StateNotShooting.cs').read()
     generator = StateMachineGenerator()
     files = generator.generate_for_puml(puml, cs_generator)
-    assert 'StateInitial.cs' in files
+    assert 'StateNotShooting.cs' in files
     expected = filter_code(istate)
     actual = filter_code(files['StateNotShooting.cs'])
     assert expected == actual

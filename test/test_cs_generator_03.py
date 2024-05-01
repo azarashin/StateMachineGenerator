@@ -30,7 +30,7 @@ def test_cs_generator_03_01():
     actual = filter_code(files['BaseState.cs'])
     assert expected == actual
 
-def test_cs_generator_03_03():
+def test_cs_generator_03_02():
     cs_generator = CSGenerator()
     puml = open('./test/data/plant_uml/test03.puml', 'r').read()
     istate = open('./test/data/cs/test03/IControllee.cs').read()
@@ -124,7 +124,7 @@ def test_cs_generator_03_10():
     istate = open('./test/data/cs/test03/StateNotShooting.cs').read()
     generator = StateMachineGenerator()
     files = generator.generate_for_puml(puml, cs_generator)
-    assert 'StateInitial.cs' in files
+    assert 'StateNotShooting.cs' in files
     expected = filter_code(istate)
     actual = filter_code(files['StateNotShooting.cs'])
     assert expected == actual
