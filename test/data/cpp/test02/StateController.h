@@ -1,12 +1,9 @@
 #pragma once
-
 class StateController;
-
 #include "IControllee.h"
 #include "BaseState.h"
 #include "StateState1.h"
 #include "StateState2.h"
-
 class StateController
 {
 private:

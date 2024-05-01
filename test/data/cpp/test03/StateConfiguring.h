@@ -1,8 +1,6 @@
 #pragma once
-
 #include "BaseState.h"
 #include "StateController.h"
-
 class StateConfiguring : public BaseState
 {
 private:

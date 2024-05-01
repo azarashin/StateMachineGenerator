@@ -1,8 +1,6 @@
 #pragma once
-
 #include "BaseState.h"
 #include "StateController.h"
-
 /// <summary>
 /// this is a string
 /// this is another string

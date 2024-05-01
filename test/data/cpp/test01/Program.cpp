@@ -1,19 +1,17 @@
 #include "ConsoleOutControllee.h"
 #include "StateController.h"
 #include <stdio.h>
-
 int main(int argc, const char** argv)
 {
     IControllee* controllee = new ConsoleOutControllee();
     StateController* stateController = new StateController(controllee);
-
-    int number = 1; 
+    int number = 1;
     while(number != 0)
     {
         printf("current state: %s\n", stateController->GetCurrentStateName());
         if(stateController->TryTransitWithoutEvent())
         {
-            continue; 
+            continue;
         }
         printf("1. Command1\n");
         printf("2. Command2\n");
@@ -39,6 +37,6 @@ int main(int argc, const char** argv)
                 break;
         }
     }
-    delete controllee; 
-    delete stateController; 
+    delete controllee;
+    delete stateController;
 }

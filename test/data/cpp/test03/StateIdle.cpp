@@ -1,5 +1,4 @@
 #include "StateIdle.h"
-
 StateIdle::StateIdle(StateController* stateController, IControllee* controllee) : BaseState(controllee)
 {
     _stateController = stateController;

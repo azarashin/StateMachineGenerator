@@ -1,5 +1,4 @@
 #include "BaseState.h"
-
 BaseState::BaseState(IControllee* controllee)
 {
     _controllee = controllee;
@@ -9,8 +8,7 @@ BaseState::~BaseState()
 }
 void BaseState::Setup()
 {
-
-} 
+}
 BaseState* BaseState::TransitEscape()
 {
     _controllee->NoTransition(GetStateName(), "Escape");

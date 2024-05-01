@@ -1,5 +1,4 @@
 #include "StateEscaped.h"
-
 StateEscaped::StateEscaped(StateController* stateController, IControllee* controllee) : BaseState(controllee)
 {
     _stateController = stateController;

@@ -1,7 +1,5 @@
 #pragma once
-
 #include "IControllee.h"
-
 class BaseState
 {
 private:
@@ -14,6 +12,5 @@ public:
     virtual BaseState* TransitCommand2();
     virtual BaseState* TransitCommand3();
     virtual BaseState* TryTransitWithoutEvent();
-
     virtual const char* GetStateName() = 0;
-}; 
+};

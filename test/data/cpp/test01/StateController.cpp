@@ -1,11 +1,10 @@
 #include "StateController.h"
-
 StateController::StateController(IControllee* controllee)
 {
     _controllee = controllee;
     InstanceOfState1 = new StateState1(this, _controllee);
     InstanceOfState2 = new StateState2(this, _controllee);
-    _currentState = InstanceOfState1; 
+    _currentState = InstanceOfState1;
 }
 StateController::~StateController()
 {
@@ -16,9 +15,9 @@ bool StateController::TryTransitWithoutEvent()
 {
     if(_currentState == 0)
     {
-        return false; 
+        return false;
     }
-    BaseState* current = _currentState; 
+    BaseState* current = _currentState;
     _currentState = _currentState->TryTransitWithoutEvent();
     return (current != _currentState);
 }
@@ -57,7 +56,6 @@ const char* StateController::GetCurrentStateName()
     }
     else
     {
-        return _currentState->GetStateName(); 
+        return _currentState->GetStateName();
     }
 }
-

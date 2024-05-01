@@ -1,6 +1,5 @@
 #include "ConsoleOutControllee.h"
 #include <stdio.h>
-
 ConsoleOutControllee::ConsoleOutControllee()
 {
 }

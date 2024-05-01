@@ -1,7 +1,5 @@
 #pragma once
-
 #include "IControllee.h"
-
 class ConsoleOutControllee : public IControllee
 {
 public:
@@ -12,4 +10,4 @@ public:
     virtual void DoAction3();
     virtual void NoTransition(const char* state, const char* transition);
     virtual void OverTransition(const char* transition);
-}; 
+};

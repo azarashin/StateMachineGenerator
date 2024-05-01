@@ -1,7 +1,6 @@
 #include "ConsoleOutControllee.h"
 #include "StateController.h"
 #include <stdio.h>
-
 int main(int argc, const char** argv)
 {
     IControllee* controllee = new ConsoleOutControllee();

@@ -1,7 +1,5 @@
 #pragma once
-
 class StateController;
-
 #include "IControllee.h"
 #include "BaseState.h"
 #include "StateConfiguring.h"
@@ -9,7 +7,6 @@ class StateController;
 #include "StateIdle.h"
 #include "StateInitial.h"
 #include "StateNotShooting.h"
-
 class StateController
 {
 private:
@@ -20,7 +17,7 @@ public:
     BaseState* InstanceOfEscaped;
     BaseState* InstanceOfIdle;
     BaseState* InstanceOfInitial;
-    BaseState* InstanceOfNotShooting; 
+    BaseState* InstanceOfNotShooting;
     StateController(IControllee* controllee);
     virtual ~StateController();
     bool TryTransitWithoutEvent();

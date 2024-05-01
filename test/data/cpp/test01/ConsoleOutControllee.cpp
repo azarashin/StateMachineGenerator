@@ -1,13 +1,10 @@
 #include "ConsoleOutControllee.h"
 #include <stdio.h>
-
 ConsoleOutControllee::ConsoleOutControllee()
 {
-
 }
 ConsoleOutControllee::~ConsoleOutControllee()
 {
-
 }
 void ConsoleOutControllee::DoAction1()
 {
@@ -25,7 +22,6 @@ void ConsoleOutControllee::NoTransition(const char* state, const char* transitio
 {
     printf("NoTransition(%s: %s)", state, transition);
 }
-
 void ConsoleOutControllee::OverTransition(const char* transition)
 {
     printf("OverTransition(%s)", transition);

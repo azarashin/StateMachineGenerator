@@ -1,5 +1,4 @@
 #include "StateState1.h"
-
 StateState1::StateState1(StateController* stateController, IControllee* controllee) : BaseState(controllee)
 {
     _stateController = stateController;
@@ -7,7 +6,6 @@ StateState1::StateState1(StateController* stateController, IControllee* controll
 }
 StateState1::~StateState1()
 {
-    
 }
 BaseState* StateState1::TransitCommand1()
 {

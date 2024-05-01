@@ -1,7 +1,5 @@
 #pragma once
-
 #include "IControllee.h"
-
 class BaseState
 {
 private:

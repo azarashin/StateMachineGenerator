@@ -1,5 +1,4 @@
 #include "StateController.h"
-
 StateController::StateController(IControllee* controllee)
 {
     _controllee = controllee;

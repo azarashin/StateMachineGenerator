@@ -1,5 +1,4 @@
 #include "StateInitial.h"
-
 StateInitial::StateInitial(StateController* stateController, IControllee* controllee) : BaseState(controllee)
 {
     _stateController = stateController;

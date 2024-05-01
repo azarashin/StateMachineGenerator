@@ -1,5 +1,4 @@
 #include "StateNotShooting.h"
-
 StateNotShooting::StateNotShooting(StateController* stateController, IControllee* controllee) : BaseState(controllee)
 {
     _stateController = stateController;

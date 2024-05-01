@@ -1,5 +1,4 @@
 #include "StateConfiguring.h"
-
 StateConfiguring::StateConfiguring(StateController* stateController, IControllee* controllee) : BaseState(controllee)
 {
     _stateController = stateController;
