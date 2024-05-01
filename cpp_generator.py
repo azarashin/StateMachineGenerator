@@ -70,6 +70,39 @@ void BaseState::Setup()
 {{
 \treturn this;
 }}
+void {self._base_state_class_name}::SetupSubState(BaseState* child)
+{{
+\t_currentSubState = child; 
+\t_currentSubState->Setup();
+}}
+{self._base_state_class_name}* {self._base_state_class_name}::CurrentSubState()
+{{
+\treturn _currentSubState;
+}}
+{self._base_state_class_name}* {self._base_state_class_name}::TransitBySubState({self._base_state_class_name}* nextState)
+{{
+\tif(nextState == 0 || _currentSubState == 0)
+\t{{
+\t\treturn nextState;
+\t}}
+\tBaseState* parentOfNextState = _currentSubState->GetParent();
+\tBaseState* parentOfCurrentState = nextState->GetParent();
+\tif(parentOfNextState != 0 && parentOfCurrentState != 0 && parentOfNextState == parentOfCurrentState)
+\t{{
+\t\t_currentSubState = nextState;
+\t\treturn this;
+\t}}
+\treturn nextState;
+}}
+void {self._base_state_class_name}::TransitForChild(BaseState* child)
+{{
+\t_currentSubState = child;
+\tBaseState* parent = GetParent();
+\tif(parent != 0)
+\t{{
+\t\tparent->TransitForChild(this);
+\t}}
+}}
         """
         return ret
 
@@ -84,13 +117,17 @@ class {self._base_state_class_name}
 {{
 private:
 \t{self._icontrollee_class_name}* _controllee; 
+\t{self._base_state_class_name}* _currentSubState;
 public:
 \t{self._base_state_class_name}({self._icontrollee_class_name}* controllee);
 \tvirtual ~{self._base_state_class_name}();
 \tvirtual void Setup(); 
 {transition_list}
 \tvirtual {self._base_state_class_name}* TryTransitWithoutEvent();
-\t
+\tvoid SetupSubState(BaseState* child);
+\t{self._base_state_class_name}* CurrentSubState();
+\t{self._base_state_class_name}* TransitBySubState({self._base_state_class_name}* nextState);
+\tvoid TransitForChild(BaseState* child);
 \tvirtual const char* GetStateName() = 0;
 \tvirtual {self._base_state_class_name}* GetParent() = 0;
 }};
@@ -315,22 +352,13 @@ public:
         return f"""
 {self._base_state_class_name}* {self._prefix_state}{state_name}::{self._prefix_method}{event}()
 {{
-\tif(_currentState == 0)
+\tBaseState* currentSubState = CurrentSubState();
+\tif(currentSubState != 0)
 \t{{
-\t\treturn 0; 
+\t\t{self._base_state_class_name}* nextState = currentSubState->{self._prefix_method}{event}();
+\t\treturn TransitBySubState(nextState);
 \t}}
-\t{self._base_state_class_name}* nextState = _currentState->{self._prefix_method}{event}();
-\tif(nextState == 0)
-\t{{
-\t\treturn nextState; 
-\t}}
-\t{self._base_state_class_name}* parentOfNextState = _currentState->GetParent();
-\t{self._base_state_class_name}* parentOfCurrentState = nextState->GetParent();
-\tif(parentOfNextState != 0 && parentOfCurrentState != 0 && parentOfNextState == parentOfCurrentState)
-\t{{
-\t\treturn this; 
-\t}}
-\treturn nextState;
+\treturn 0; 
 }}
 """
 
@@ -354,8 +382,7 @@ const char* {self._prefix_state}{state.name}::GetStateName()
             setup_code = f"""
 void {self._prefix_state}{state.name}::Setup()
 {{
-\t_currentState = _stateController->InstanceOf{state.initial_state}; 
-\t_currentState->Setup(); 
+\t\tSetupSubState(_stateController->InstanceOf{state.initial_state});
 }}
 """
             sub_transitions = state_manager.get_all_transitions_under_the_state(state.name)
@@ -363,11 +390,12 @@ void {self._prefix_state}{state.name}::Setup()
             state_name = f"""
 const char* {self._prefix_state}{state.name}::GetStateName()
 {{
-\tif(_currentState == 0)
+\t{self._base_state_class_name}* currentSubState = CurrentSubState();
+\tif(currentSubState == 0)
 \t{{
 \t\treturn "{state.get_full_name()}(end)";
 \t}}
-\treturn _currentState->GetStateName(); 
+\treturn currentSubState->GetStateName(); 
 }}
 """
 
@@ -403,11 +431,9 @@ const char* {self._prefix_state}{state.name}::GetStateName()
         transition_codes = '\n'.join([self.generate_transition_h(d.event) for d in sorted(target_transitions, key=lambda x: x.get_event_as_key())])
         description_body = ''
         setup_code = ""
-        setup_description = ""
         sub_transition_codes = ""
         if state.initial_state:
             setup_code = f"""\tvirtual void Setup(); """
-            setup_description = f"\tBaseState* _currentState;"
             sub_transitions = state_manager.get_all_transitions_under_the_state(state.name)
             sub_transition_codes = '\n'.join([self.generate_sub_transitions_h(d) for d in sorted(sub_transitions, key=lambda x: x)])
             
@@ -433,7 +459,6 @@ class {self._prefix_state}{state.name} : public {self._base_state_class_name}
 private:
 \t{self._state_controller_class_name}* _stateController; 
 \t{self._icontrollee_class_name}* _controllee; 
-{setup_description}
 public:
 \t{self._prefix_state}{state.name}({self._state_controller_class_name}* stateController, {self._icontrollee_class_name}* controllee);
 \tvirtual ~{self._prefix_state}{state.name}();
