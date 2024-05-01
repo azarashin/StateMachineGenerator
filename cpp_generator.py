@@ -530,7 +530,7 @@ int main(int argc, const char** argv)
 {{
 
 
-\tIControllee* controllee = new ConsoleOutControllee();
+\t{self._icontrollee_class_name}* controllee = new ConsoleOutControllee();
 \tStateController* stateController = new StateController(controllee);
 
 \tint number = 1; 

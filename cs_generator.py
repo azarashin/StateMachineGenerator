@@ -366,7 +366,7 @@ public class {self._prefix_state}{state.name} : {self._base_state_class_name}
         menu_list = '\n'.join([self._transition_menu(i + 1, event_list[i]) for i in range(len(event_list))])
         case_list = '\n'.join([self._transition_case(i + 1, event_list[i]) for i in range(len(event_list))])
         ret = f"""
-IControllee controllee = new ConsoleOutControllee();
+{self._icontrollee_class_name} controllee = new ConsoleOutControllee();
 StateController stateController = new StateController(controllee);
 
 int number = 1; 
