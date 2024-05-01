@@ -62,7 +62,7 @@ class CPPGenerator:
 {{
 
 }}
-void BaseState::Setup()
+void {self._base_state_class_name}::Setup()
 {{
 }} 
 {transition_list}
@@ -70,10 +70,13 @@ void BaseState::Setup()
 {{
 \treturn this;
 }}
-void {self._base_state_class_name}::SetupSubState(BaseState* child)
+void {self._base_state_class_name}::SetupSubState({self._base_state_class_name}* child)
 {{
 \t_currentSubState = child; 
-\t_currentSubState->Setup();
+\tif(_currentSubState != 0)
+\t{{
+\t\t_currentSubState->Setup();
+\t}}
 }}
 {self._base_state_class_name}* {self._base_state_class_name}::CurrentSubState()
 {{
@@ -85,8 +88,8 @@ void {self._base_state_class_name}::SetupSubState(BaseState* child)
 \t{{
 \t\treturn nextState;
 \t}}
-\tBaseState* parentOfNextState = _currentSubState->GetParent();
-\tBaseState* parentOfCurrentState = nextState->GetParent();
+\t{self._base_state_class_name}* parentOfNextState = _currentSubState->GetParent();
+\t{self._base_state_class_name}* parentOfCurrentState = nextState->GetParent();
 \tif(parentOfNextState != 0 && parentOfCurrentState != 0 && parentOfNextState == parentOfCurrentState)
 \t{{
 \t\t_currentSubState = nextState;
@@ -94,14 +97,24 @@ void {self._base_state_class_name}::SetupSubState(BaseState* child)
 \t}}
 \treturn nextState;
 }}
-void {self._base_state_class_name}::TransitForChild(BaseState* child)
+{self._base_state_class_name}* {self._base_state_class_name}::TransitForChild({self._base_state_class_name}* child)
 {{
 \t_currentSubState = child;
-\tBaseState* parent = GetParent();
+\t{self._base_state_class_name}* parent = GetParent();
 \tif(parent != 0)
 \t{{
-\t\tparent->TransitForChild(this);
+\t\treturn parent->TransitForChild(this);
 \t}}
+\treturn this; 
+}}
+{self._base_state_class_name}* {self._base_state_class_name}::OutlineState()
+{{
+\t{self._base_state_class_name}* parent = GetParent();
+\tif(parent != 0)
+\t{{
+\t\treturn parent->TransitForChild(this);
+\t}}
+\treturn this; 
 }}
         """
         return ret
@@ -124,10 +137,11 @@ public:
 \tvirtual void Setup(); 
 {transition_list}
 \tvirtual {self._base_state_class_name}* TryTransitWithoutEvent();
-\tvoid SetupSubState(BaseState* child);
+\tvoid SetupSubState({self._base_state_class_name}* child);
 \t{self._base_state_class_name}* CurrentSubState();
 \t{self._base_state_class_name}* TransitBySubState({self._base_state_class_name}* nextState);
-\tvoid TransitForChild(BaseState* child);
+\t{self._base_state_class_name}* TransitForChild({self._base_state_class_name}* child);
+\t{self._base_state_class_name}* OutlineState();
 \tvirtual const char* GetStateName() = 0;
 \tvirtual {self._base_state_class_name}* GetParent() = 0;
 }};
@@ -230,6 +244,10 @@ public:
 \tif(_currentState != 0)
 \t{{
 \t\t_currentState = _currentState->{self._prefix_method}{event}();
+\t\tif(_currentState != 0)
+\t\t{{
+\t\t\t_currentState = _currentState->OutlineState();
+\t\t}}
 \t}} else {{
 \t\t_controllee->OverTransition("{event}");
 \t}}
@@ -265,6 +283,10 @@ bool {self._state_controller_class_name}::TryTransitWithoutEvent()
 \t}}
 \t{self._base_state_class_name}* current = _currentState; 
 \t_currentState = _currentState->TryTransitWithoutEvent();
+\tif(_currentState != 0)
+\t{{
+\t\t_currentState = _currentState->OutlineState();
+\t}}
 \treturn (current != _currentState);
 }}
 {transition_list}
@@ -352,7 +374,7 @@ public:
         return f"""
 {self._base_state_class_name}* {self._prefix_state}{state_name}::{self._prefix_method}{event}()
 {{
-\tBaseState* currentSubState = CurrentSubState();
+\t{self._base_state_class_name}* currentSubState = CurrentSubState();
 \tif(currentSubState != 0)
 \t{{
 \t\t{self._base_state_class_name}* nextState = currentSubState->{self._prefix_method}{event}();

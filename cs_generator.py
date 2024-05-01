@@ -60,10 +60,13 @@ abstract public class {self._base_state_class_name}
 \t{{
 \t\treturn this;
 \t}}
-\tpublic void SetupSubState(BaseState child)
+\tpublic void SetupSubState({self._base_state_class_name}? child)
 \t{{
 \t\t_currentSubState = child; 
-\t\t_currentSubState.Setup();
+\t\tif(_currentSubState != null)
+\t\t{{
+\t\t\t_currentSubState.Setup();
+\t\t}}
 \t}}
 \tpublic {self._base_state_class_name}? CurrentSubState()
 \t{{
@@ -75,8 +78,8 @@ abstract public class {self._base_state_class_name}
 \t\t{{
 \t\t\treturn nextState;
 \t\t}}
-\t\tBaseState? parentOfNextState = _currentSubState.GetParent();
-\t\tBaseState? parentOfCurrentState = nextState.GetParent();
+\t\t{self._base_state_class_name}? parentOfNextState = _currentSubState.GetParent();
+\t\t{self._base_state_class_name}? parentOfCurrentState = nextState.GetParent();
 \t\tif(parentOfNextState is not null && parentOfCurrentState is not null && parentOfNextState == parentOfCurrentState)
 \t\t{{
 \t\t\t_currentSubState = nextState;
@@ -84,17 +87,27 @@ abstract public class {self._base_state_class_name}
 \t\t}}
 \t\treturn nextState;
 \t}}
-\tpublic void TransitForChild(BaseState? child)
+\tpublic {self._base_state_class_name}? TransitForChild({self._base_state_class_name}? child)
 \t{{
 \t\t_currentSubState = child;
-\t\tBaseState? parent = GetParent();
+\t\t{self._base_state_class_name}? parent = GetParent();
 \t\tif(parent != null)
 \t\t{{
-\t\t\tparent.TransitForChild(this);
+\t\t\treturn parent.TransitForChild(this);
 \t\t}}
+\t\treturn this; 
+\t}}
+\tpublic {self._base_state_class_name}? OutlineState()
+\t{{
+\t\t{self._base_state_class_name}? parent = GetParent();
+\t\tif(parent != null)
+\t\t{{
+\t\t\treturn parent.TransitForChild(this);
+\t\t}}
+\t\treturn this; 
 \t}}
 \tpublic abstract string GetStateName();
-\tpublic abstract BaseState? GetParent();
+\tpublic abstract {self._base_state_class_name}? GetParent();
 }}
         """
         return ret
@@ -156,6 +169,10 @@ public class {self._console_controllee_class_name} : {self._icontrollee_class_na
 \t\tif(_currentState != null)
 \t\t{{
 \t\t\t_currentState = _currentState.{self._prefix_method}{event}();
+\t\t\tif(_currentState != null)
+\t\t\t{{
+\t\t\t\t_currentState = _currentState.OutlineState();
+\t\t\t}}
 \t\t}} else {{
 \t\t\t_controllee.OverTransition("{event}");
 \t\t}}
@@ -188,6 +205,10 @@ public class {self._state_controller_class_name}
 \t\t}}
 \t\t{self._base_state_class_name}? current = _currentState; 
 \t\t_currentState = _currentState.TryTransitWithoutEvent();
+\t\tif(_currentState != null)
+\t\t{{
+\t\t\t_currentState = _currentState.OutlineState();
+\t\t}}
 \t\treturn (current != _currentState);
 \t}}
 {transition_list}
