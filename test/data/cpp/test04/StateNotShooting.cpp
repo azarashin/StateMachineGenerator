@@ -28,7 +28,11 @@ BaseState* StateNotShooting::TransitEvConfig()
 }
 const char* StateNotShooting::GetStateName()
 {
-    return "NotShooting";
+    if(_currentState == 0)
+    {
+        return "NotShooting(end)";
+    }
+    return _currentState->GetStateName();
 }
 BaseState* StateNotShooting::GetParent()
 {
