@@ -226,6 +226,12 @@ public class {self._state_controller_class_name}
         setup_code = ""
         setup_description = ""
         sub_transition_codes = ""
+        state_name = f"""
+\tpublic override string GetStateName()
+\t{{
+\t\treturn "{state.get_full_name()}"; 
+\t}}
+"""
         if state.initial_state:
             setup_code = f"""
 \tpublic override void Setup()
@@ -237,6 +243,16 @@ public class {self._state_controller_class_name}
             setup_description = f"""\tprivate {self._base_state_class_name}? _currentState; """
             sub_transitions = state_manager.get_all_transitions_under_the_state(state.name)
             sub_transition_codes = '\n'.join([self.generate_sub_transitions(d) for d in sorted(sub_transitions, key=lambda x: x)])
+            state_name = f"""
+\tpublic override string GetStateName()
+\t{{
+\t\tif(_currentState == null)
+\t\t{{
+\t\t\treturn "{state.get_full_name()}(end)";
+\t\t}}
+\t\treturn _currentState.GetStateName(); 
+\t}}
+"""
 
         if state.parent:
             parent = f'_stateController.{self._prefix_instance_of}{state.parent.name}'
@@ -259,10 +275,9 @@ public class {self._prefix_state}{state.name} : {self._base_state_class_name}
 {setup_code}
 {transition_codes}
 {sub_transition_codes}
-\tpublic override string GetStateName()
+{state_name}
 \tpublic override BaseState? GetParent()
 \t{{
-\t\treturn "{state.get_full_name()}"; 
 \t\treturn {parent}; 
 \t}}
 }}
