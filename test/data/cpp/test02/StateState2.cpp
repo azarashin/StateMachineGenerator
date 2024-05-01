@@ -16,3 +16,7 @@ const char* StateState2::GetStateName()
 {
     return "State2";
 }
+BaseState* StateState2::GetParent()
+{
+    return 0;
+}

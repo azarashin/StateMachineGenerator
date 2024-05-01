@@ -17,3 +17,7 @@ const char* StateConfiguring::GetStateName()
 {
     return "NotShooting.Configuring";
 }
+BaseState* StateConfiguring::GetParent()
+{
+    return _stateController->InstanceOfNotShooting;
+}

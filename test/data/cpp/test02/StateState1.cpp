@@ -21,3 +21,7 @@ const char* StateState1::GetStateName()
 {
     return "State1";
 }
+BaseState* StateState1::GetParent()
+{
+    return 0;
+}

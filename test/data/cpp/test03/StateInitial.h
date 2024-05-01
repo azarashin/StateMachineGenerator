@@ -11,4 +11,5 @@ public:
     virtual ~StateInitial();
     virtual BaseState* TransitGoInTo();
     virtual const char* GetStateName();
+    virtual BaseState* GetParent();
 };

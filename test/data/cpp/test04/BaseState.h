@@ -7,10 +7,11 @@ private:
 public:
     BaseState(IControllee* controllee);
     virtual ~BaseState();
-    virtual void Setup(); 
+    virtual void Setup();
     virtual BaseState* TransitEscape();
     virtual BaseState* TransitEvConfig();
     virtual BaseState* TransitGoInTo();
     virtual BaseState* TryTransitWithoutEvent();
     virtual const char* GetStateName() = 0;
+    virtual BaseState* GetParent() = 0;
 };

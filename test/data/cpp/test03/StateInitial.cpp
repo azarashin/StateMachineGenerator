@@ -17,3 +17,7 @@ const char* StateInitial::GetStateName()
 {
     return "Initial";
 }
+BaseState* StateInitial::GetParent()
+{
+    return 0;
+}

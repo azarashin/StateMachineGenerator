@@ -8,12 +8,13 @@
 class StateState1 : public BaseState
 {
 private:
-    StateController* _stateController; 
-    IControllee* _controllee; 
+    StateController* _stateController;
+    IControllee* _controllee;
 public:
     StateState1(StateController* stateController, IControllee* controllee);
-    virtual ~StateState1(); 
+    virtual ~StateState1();
     virtual BaseState* TransitCommand1();
     virtual BaseState* TransitCommand2();
     virtual const char* GetStateName();
-}; 
+    virtual BaseState* GetParent();
+};

@@ -17,3 +17,7 @@ const char* StateIdle::GetStateName()
 {
     return "NotShooting.Idle";
 }
+BaseState* StateIdle::GetParent()
+{
+    return _stateController->InstanceOfNotShooting;
+}

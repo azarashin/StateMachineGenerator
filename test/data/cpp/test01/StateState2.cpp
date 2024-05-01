@@ -14,5 +14,9 @@ BaseState* StateState2::TransitCommand3()
 }
 const char* StateState2::GetStateName()
 {
-    return "State2"; 
+    return "State2";
+}
+BaseState* StateState2::GetParent()
+{
+    return 0;
 }

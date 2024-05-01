@@ -21,12 +21,16 @@ BaseState* StateNotShooting::TransitEvConfig()
 {
     if(_currentState != 0)
     {
-        _currentState = _currentState->TransitEvConfig(); 
-        return this; 
+        _currentState = _currentState->TransitEvConfig();
+        return this;
     }
-    return 0; 
+    return 0;
 }
 const char* StateNotShooting::GetStateName()
 {
     return "NotShooting";
+}
+BaseState* StateNotShooting::GetParent()
+{
+    return 0;
 }

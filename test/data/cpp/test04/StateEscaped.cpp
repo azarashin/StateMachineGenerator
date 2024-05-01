@@ -11,3 +11,7 @@ const char* StateEscaped::GetStateName()
 {
     return "Escaped";
 }
+BaseState* StateEscaped::GetParent()
+{
+    return 0;
+}

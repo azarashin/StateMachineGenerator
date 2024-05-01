@@ -10,4 +10,5 @@ public:
     StateEscaped(StateController* stateController, IControllee* controllee);
     virtual ~StateEscaped();
     virtual const char* GetStateName();
+    virtual BaseState* GetParent();
 };
