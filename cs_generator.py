@@ -247,6 +247,7 @@ public class {self._state_controller_class_name}
 \tpublic override void Setup()
 \t{{
 \t\t_currentState = _stateController.InstanceOf{state.initial_state}; 
+\t\t_currentState.Setup();
 \t\treturn;
 \t}}
 """
