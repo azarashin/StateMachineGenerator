@@ -315,12 +315,22 @@ public:
         return f"""
 {self._base_state_class_name}* {self._prefix_state}{state_name}::{self._prefix_method}{event}()
 {{
-\tif(_currentState != 0)
+\tif(_currentState == 0)
 \t{{
-\t\t_currentState = _currentState->{self._prefix_method}{event}();
+\t\treturn 0; 
+\t}}
+\t{self._base_state_class_name}* nextState = _currentState->{self._prefix_method}{event}();
+\tif(nextState == 0)
+\t{{
+\t\treturn nextState; 
+\t}}
+\t{self._base_state_class_name}* parentOfNextState = _currentState->GetParent();
+\t{self._base_state_class_name}* parentOfCurrentState = nextState->GetParent();
+\tif(parentOfNextState != 0 && parentOfCurrentState != 0 && parentOfNextState == parentOfCurrentState)
+\t{{
 \t\treturn this; 
 \t}}
-\treturn 0; 
+\treturn nextState;
 }}
 """
 
