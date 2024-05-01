@@ -19,10 +19,13 @@ abstract public class BaseState
     {
         return this;
     }
-    public void SetupSubState(BaseState child)
+    public void SetupSubState(BaseState? child)
     {
         _currentSubState = child;
-        _currentSubState.Setup();
+        if(_currentSubState != null)
+        {
+            _currentSubState.Setup();
+        }
     }
     public BaseState? CurrentSubState()
     {
@@ -43,14 +46,24 @@ abstract public class BaseState
         }
         return nextState;
     }
-    public void TransitForChild(BaseState? child)
+    public BaseState? TransitForChild(BaseState? child)
     {
         _currentSubState = child;
         BaseState? parent = GetParent();
         if(parent != null)
         {
-            parent.TransitForChild(this);
+            return parent.TransitForChild(this);
         }
+        return this;
+    }
+    public BaseState? OutlineState()
+    {
+        BaseState? parent = GetParent();
+        if(parent != null)
+        {
+            return parent.TransitForChild(this);
+        }
+        return this;
     }
     public abstract string GetStateName();
     public abstract BaseState? GetParent();

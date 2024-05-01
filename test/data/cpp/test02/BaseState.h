@@ -14,7 +14,8 @@ public:
     void SetupSubState(BaseState* child);
     BaseState* CurrentSubState();
     BaseState* TransitBySubState(BaseState* nextState);
-    void TransitForChild(BaseState* child);
+    BaseState* TransitForChild(BaseState* child);
+    BaseState* OutlineState();
     virtual const char* GetStateName() = 0;
     virtual BaseState* GetParent() = 0;
 };

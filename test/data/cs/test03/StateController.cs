@@ -25,6 +25,10 @@ public class StateController
         }
         BaseState? current = _currentState;
         _currentState = _currentState.TryTransitWithoutEvent();
+        if(_currentState != null)
+        {
+            _currentState = _currentState.OutlineState();
+        }
         return (current != _currentState);
     }
     public void TransitEscape()
@@ -32,6 +36,10 @@ public class StateController
         if(_currentState != null)
         {
             _currentState = _currentState.TransitEscape();
+            if(_currentState != null)
+            {
+                _currentState = _currentState.OutlineState();
+            }
         } else {
             _controllee.OverTransition("Escape");
         }
@@ -41,6 +49,10 @@ public class StateController
         if(_currentState != null)
         {
             _currentState = _currentState.TransitEvConfig();
+            if(_currentState != null)
+            {
+                _currentState = _currentState.OutlineState();
+            }
         } else {
             _controllee.OverTransition("EvConfig");
         }
@@ -50,6 +62,10 @@ public class StateController
         if(_currentState != null)
         {
             _currentState = _currentState.TransitGoInTo();
+            if(_currentState != null)
+            {
+                _currentState = _currentState.OutlineState();
+            }
         } else {
             _controllee.OverTransition("GoInTo");
         }

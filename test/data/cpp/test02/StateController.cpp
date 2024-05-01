@@ -19,6 +19,10 @@ bool StateController::TryTransitWithoutEvent()
     }
     BaseState* current = _currentState;
     _currentState = _currentState->TryTransitWithoutEvent();
+    if(_currentState != 0)
+    {
+        _currentState = _currentState->OutlineState();
+    }
     return (current != _currentState);
 }
 void StateController::TransitCommand1()
@@ -26,6 +30,10 @@ void StateController::TransitCommand1()
     if(_currentState != 0)
     {
         _currentState = _currentState->TransitCommand1();
+        if(_currentState != 0)
+        {
+            _currentState = _currentState->OutlineState();
+        }
     } else {
         _controllee->OverTransition("Command1");
     }

@@ -31,7 +31,10 @@ BaseState* BaseState::TryTransitWithoutEvent()
 void BaseState::SetupSubState(BaseState* child)
 {
     _currentSubState = child;
-    _currentSubState->Setup();
+    if(_currentSubState != 0)
+    {
+        _currentSubState->Setup();
+    }
 }
 BaseState* BaseState::CurrentSubState()
 {
@@ -52,12 +55,22 @@ BaseState* BaseState::TransitBySubState(BaseState* nextState)
     }
     return nextState;
 }
-void BaseState::TransitForChild(BaseState* child)
+BaseState* BaseState::TransitForChild(BaseState* child)
 {
     _currentSubState = child;
     BaseState* parent = GetParent();
     if(parent != 0)
     {
-        parent->TransitForChild(this);
+        return parent->TransitForChild(this);
     }
+    return this;
+}
+BaseState* BaseState::OutlineState()
+{
+    BaseState* parent = GetParent();
+    if(parent != 0)
+    {
+        return parent->TransitForChild(this);
+    }
+    return this;
 }

@@ -19,6 +19,10 @@ public class StateController
         }
         BaseState? current = _currentState;
         _currentState = _currentState.TryTransitWithoutEvent();
+        if(_currentState != null)
+        {
+            _currentState = _currentState.OutlineState();
+        }
         return (current != _currentState);
     }
     public void TransitCommand1()
@@ -26,6 +30,10 @@ public class StateController
         if(_currentState != null)
         {
             _currentState = _currentState.TransitCommand1();
+            if(_currentState != null)
+            {
+                _currentState = _currentState.OutlineState();
+            }
         } else {
             _controllee.OverTransition("Command1");
         }
