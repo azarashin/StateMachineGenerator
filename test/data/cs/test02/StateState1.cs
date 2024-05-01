@@ -4,8 +4,8 @@
 /// </summary>
 public class StateState1 : BaseState
 {
-    private StateController _stateController; 
-    private IControllee _controllee; 
+    private StateController _stateController;
+    private IControllee _controllee;
     public StateState1(StateController stateController, IControllee controllee) : base(controllee)
     {
         _stateController = stateController;
@@ -19,10 +19,14 @@ public class StateState1 : BaseState
     public override BaseState? TryTransitWithoutEvent()
     {
         _stateController.InstanceOfState2.Setup();
-        return _stateController.InstanceOfState2; 
+        return _stateController.InstanceOfState2;
     }
     public override string GetStateName()
     {
-        return "State1"; 
+        return "State1";
+    }
+    public override BaseState? GetParent()
+    {
+        return null;
     }
 }

@@ -1,7 +1,7 @@
 public class StateInitial : BaseState
 {
-    private StateController _stateController; 
-    private IControllee _controllee; 
+    private StateController _stateController;
+    private IControllee _controllee;
     public StateInitial(StateController stateController, IControllee controllee) : base(controllee)
     {
         _stateController = stateController;
@@ -11,10 +11,14 @@ public class StateInitial : BaseState
     {
         _controllee.DoAction0();
         _stateController.InstanceOfNotShooting.Setup();
-        return _stateController.InstanceOfNotShooting; 
+        return _stateController.InstanceOfNotShooting;
     }
     public override string GetStateName()
     {
-        return "Initial"; 
+        return "Initial";
+    }
+    public override BaseState? GetParent()
+    {
+        return null;
     }
 }

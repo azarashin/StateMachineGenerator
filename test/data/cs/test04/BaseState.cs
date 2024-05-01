@@ -1,6 +1,6 @@
 abstract public class BaseState
 {
-    private IControllee _controllee; 
+    private IControllee _controllee;
     public BaseState(IControllee controllee)
     {
         _controllee = controllee;
@@ -29,5 +29,5 @@ abstract public class BaseState
         return this;
     }
     public abstract string GetStateName();
-
+    public abstract BaseState? GetParent();
 }

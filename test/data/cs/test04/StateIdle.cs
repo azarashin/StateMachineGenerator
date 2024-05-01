@@ -1,7 +1,7 @@
 public class StateIdle : BaseState
 {
-    private StateController _stateController; 
-    private IControllee _controllee; 
+    private StateController _stateController;
+    private IControllee _controllee;
     public StateIdle(StateController stateController, IControllee controllee) : base(controllee)
     {
         _stateController = stateController;
@@ -11,10 +11,14 @@ public class StateIdle : BaseState
     {
         _controllee.DoAction1();
         _stateController.InstanceOfConfiguring.Setup();
-        return _stateController.InstanceOfConfiguring; 
+        return _stateController.InstanceOfConfiguring;
     }
     public override string GetStateName()
     {
-        return "NotShooting.Idle"; 
+        return "NotShooting.Idle";
+    }
+    public override BaseState? GetParent()
+    {
+        return _stateController.InstanceOfNotShooting;
     }
 }

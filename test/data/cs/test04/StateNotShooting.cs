@@ -32,4 +32,8 @@ public class StateNotShooting : BaseState
     {
         return "NotShooting"; 
     }
+    public override BaseState? GetParent()
+    {
+        return null;
+    }
 }
