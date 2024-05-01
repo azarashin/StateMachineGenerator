@@ -1,0 +1,17 @@
+@startuml
+
+NotShooting --> Escaped : Escape / Action3
+
+state NotShooting {
+  [*] --> Idle
+  Idle --> Configuring : EvConfig / Action1
+  Configuring --> Idle : EvConfig / Action2
+}
+
+Initial --> NotShooting : GoInTo / Action0
+
+[*] --> Initial
+
+
+
+@enduml
