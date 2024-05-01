@@ -20,7 +20,6 @@ public class ConsoleOutControllee : IControllee
     {
         Console.WriteLine($"NoTransition({state}: {transition})");
     }
-
     public void OverTransition(string transition)
     {
         Console.WriteLine($"OverTransition({transition})");

@@ -1,13 +1,12 @@
 IControllee controllee = new ConsoleOutControllee();
 StateController stateController = new StateController(controllee);
-
-int number = 1; 
+int number = 1;
 while(number != 0)
 {
     Console.WriteLine($"current state: {stateController.GetCurrentStateName()}");
     if(stateController.TryTransitWithoutEvent())
     {
-        continue; 
+        continue;
     }
     Console.WriteLine("1. Command1");
     Console.WriteLine("");

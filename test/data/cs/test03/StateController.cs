@@ -1,7 +1,7 @@
 public class StateController
 {
     private IControllee _controllee;
-    private BaseState? _currentState; 
+    private BaseState? _currentState;
     public BaseState InstanceOfConfiguring {get; private set;}
     public BaseState InstanceOfEscaped {get; private set;}
     public BaseState InstanceOfIdle {get; private set;}
@@ -15,15 +15,15 @@ public class StateController
         InstanceOfIdle = new StateIdle(this, _controllee);
         InstanceOfInitial = new StateInitial(this, _controllee);
         InstanceOfNotShooting = new StateNotShooting(this, _controllee);
-        _currentState = InstanceOfInitial; 
+        _currentState = InstanceOfInitial;
     }
     public bool TryTransitWithoutEvent()
     {
         if(_currentState == null)
         {
-            return false; 
+            return false;
         }
-        BaseState? current = _currentState; 
+        BaseState? current = _currentState;
         _currentState = _currentState.TryTransitWithoutEvent();
         return (current != _currentState);
     }
@@ -62,7 +62,7 @@ public class StateController
         }
         else
         {
-            return _currentState.GetStateName(); 
+            return _currentState.GetStateName();
         }
     }
 }

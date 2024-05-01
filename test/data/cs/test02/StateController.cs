@@ -1,7 +1,7 @@
 public class StateController
 {
     private IControllee _controllee;
-    private BaseState? _currentState; 
+    private BaseState? _currentState;
     public BaseState InstanceOfState1 {get; private set;}
     public BaseState InstanceOfState2 {get; private set;}
     public StateController(IControllee controllee)
@@ -9,15 +9,15 @@ public class StateController
         _controllee = controllee;
         InstanceOfState1 = new StateState1(this, _controllee);
         InstanceOfState2 = new StateState2(this, _controllee);
-        _currentState = InstanceOfState1; 
+        _currentState = InstanceOfState1;
     }
     public bool TryTransitWithoutEvent()
     {
         if(_currentState == null)
         {
-            return false; 
+            return false;
         }
-        BaseState? current = _currentState; 
+        BaseState? current = _currentState;
         _currentState = _currentState.TryTransitWithoutEvent();
         return (current != _currentState);
     }
@@ -38,7 +38,7 @@ public class StateController
         }
         else
         {
-            return _currentState.GetStateName(); 
+            return _currentState.GetStateName();
         }
     }
 }
