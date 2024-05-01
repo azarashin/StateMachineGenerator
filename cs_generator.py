@@ -340,18 +340,6 @@ public class {self._prefix_state}{state.name} : {self._base_state_class_name}
     def generate_state_classes(self, state_manager, state_dic, transitions):
         return {d:self.generate_state_class(d, state_manager, transitions, state_dic) for d in state_dic.values()}
 
-
-
-
-
-    def _transition_method_in_base_state(self, event):
-        return f"""\tpublic virtual {self._base_state_class_name}? {self._prefix_method}{event}()
-\t{{
-\t\t_controllee.NoTransition(GetStateName(), "{event}");
-\t\treturn this;
-\t}}
-"""
-
     def _transition_menu(self, number, event):
         return f"""\tConsole.WriteLine("{number}. {event}");"""
 

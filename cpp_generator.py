@@ -499,17 +499,6 @@ public:
     def generate_state_classes_h(self, state_manager, state_dic, transitions):
         return {d:self.generate_state_class_h(d, state_manager, transitions, state_dic) for d in state_dic.values()}
 
-
-
-
-    def _transition_method_in_base_state(self, event):
-        return f"""\tpublic virtual {self._base_state_class_name}? {self._prefix_method}{event}()
-\t{{
-\t\t_controllee.NoTransition(GetStateName(), "{event}");
-\t\treturn this;
-\t}}
-"""
-
     def _transition_menu(self, number, event):
         return f"""\t\tprintf("{number}. {event}\\n");"""
 
