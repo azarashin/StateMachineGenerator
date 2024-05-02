@@ -6,6 +6,7 @@ def test_initial_transition_01():
     assert transition is not None
     assert transition.state_to == 'State1'
     assert transition.transition_type == '-->'
+    assert transition.history is None
 
 def test_initial_transition_02():
     transition_manager = TransitionManager()
@@ -13,6 +14,7 @@ def test_initial_transition_02():
     assert transition is not None
     assert transition.state_to == 'State2'
     assert transition.transition_type == '->'
+    assert transition.history is None
 
 def test_initial_transition_03():
     transition_manager = TransitionManager()
@@ -24,6 +26,22 @@ def test_initial_transition_04():
     transition = transition_manager.is_initial_transition(' StateX  --> State4  ')
     assert transition is None
 
+def test_initial_transition_05():
+    transition_manager = TransitionManager()
+    transition = transition_manager.is_initial_transition(' [*]  ->  State2[H]  ')
+    assert transition is not None
+    assert transition.state_to == 'State2'
+    assert transition.transition_type == '->'
+    assert transition.history == '[H]'
+
+def test_initial_transition_06():
+    transition_manager = TransitionManager()
+    transition = transition_manager.is_initial_transition(' [*]  ->  State2[H*]  ')
+    assert transition is not None
+    assert transition.state_to == 'State2'
+    assert transition.transition_type == '->'
+    assert transition.history == '[H*]'
+
 def test_transition_no_event_no_action_01():
     transition_manager = TransitionManager()
     transition = transition_manager.is_transition('StateX1->StateY1')
@@ -33,6 +51,7 @@ def test_transition_no_event_no_action_01():
     assert transition.transition_type == '->'
     assert transition.event is None
     assert transition.action is None
+    assert transition.history is None
 
 def test_transition_no_event_no_action_02():
     transition_manager = TransitionManager()
@@ -43,6 +62,7 @@ def test_transition_no_event_no_action_02():
     assert transition.transition_type == '-->'
     assert transition.event is None
     assert transition.action is None
+    assert transition.history is None
 
 def test_transition_no_event_no_action_03():
     transition_manager = TransitionManager()
@@ -63,6 +83,39 @@ def test_transition_no_event_no_action_05():
     assert transition.transition_type == '->'
     assert transition.event is None
     assert transition.action is None
+    assert transition.history is None
+
+def test_transition_no_event_no_action_06():
+    transition_manager = TransitionManager()
+    transition = transition_manager.is_transition('  StateX2  -->  StateY2[H]  ')
+    assert transition is not None
+    assert transition.state_from == 'StateX2'
+    assert transition.state_to == 'StateY2'
+    assert transition.transition_type == '-->'
+    assert transition.event is None
+    assert transition.action is None
+    assert transition.history == '[H]'
+
+def test_transition_no_event_no_action_07():
+    transition_manager = TransitionManager()
+    transition = transition_manager.is_transition('  StateX2  -->  StateY2[H*]  ')
+    assert transition is not None
+    assert transition.state_from == 'StateX2'
+    assert transition.state_to == 'StateY2'
+    assert transition.transition_type == '-->'
+    assert transition.event is None
+    assert transition.action is None
+    assert transition.history == '[H*]'
+
+def test_transition_no_event_no_action_08():
+    transition_manager = TransitionManager()
+    transition = transition_manager.is_transition('StateX5->[*][H]')
+    assert transition is None
+
+def test_transition_no_event_no_action_09():
+    transition_manager = TransitionManager()
+    transition = transition_manager.is_transition('StateX5->[*][H*]')
+    assert transition is None
 
 
 def test_transition_no_action_01():
@@ -105,6 +158,37 @@ def test_transition_no_action_05():
     assert transition.event == 'Event5'
     assert transition.action is None
 
+def test_transition_no_action_06():
+    transition_manager = TransitionManager()
+    transition = transition_manager.is_transition('  StateX2  -->  StateY2[H] : Event ')
+    assert transition is not None
+    assert transition.state_from == 'StateX2'
+    assert transition.state_to == 'StateY2'
+    assert transition.transition_type == '-->'
+    assert transition.event == 'Event'
+    assert transition.action is None
+    assert transition.history == '[H]'
+
+def test_transition_no_action_07():
+    transition_manager = TransitionManager()
+    transition = transition_manager.is_transition('  StateX2  -->  StateY2[H*] : Event   ')
+    assert transition is not None
+    assert transition.state_from == 'StateX2'
+    assert transition.state_to == 'StateY2'
+    assert transition.transition_type == '-->'
+    assert transition.event == 'Event'
+    assert transition.action is None
+    assert transition.history == '[H*]'
+
+def test_transition_no_action_08():
+    transition_manager = TransitionManager()
+    transition = transition_manager.is_transition('StateX5->[*][H] : Event ')
+    assert transition is None
+
+def test_transition_no_action_09():
+    transition_manager = TransitionManager()
+    transition = transition_manager.is_transition('StateX5->[*][H*] : Event ')
+    assert transition is None
 
 
 
@@ -148,6 +232,38 @@ def test_transition_no_event_05():
     assert transition.event is None
     assert transition.action == 'Action5'
 
+def test_transition_no_event_06():
+    transition_manager = TransitionManager()
+    transition = transition_manager.is_transition('  StateX2  -->  StateY2[H] : /Action ')
+    assert transition is not None
+    assert transition.state_from == 'StateX2'
+    assert transition.state_to == 'StateY2'
+    assert transition.transition_type == '-->'
+    assert transition.event is None
+    assert transition.action == 'Action'
+    assert transition.history == '[H]'
+
+def test_transition_no_event_07():
+    transition_manager = TransitionManager()
+    transition = transition_manager.is_transition('  StateX2  -->  StateY2[H*] : / Action ')
+    assert transition is not None
+    assert transition.state_from == 'StateX2'
+    assert transition.state_to == 'StateY2'
+    assert transition.transition_type == '-->'
+    assert transition.event is None
+    assert transition.action == 'Action'
+    assert transition.history == '[H*]'
+
+def test_transition_no_event_08():
+    transition_manager = TransitionManager()
+    transition = transition_manager.is_transition('StateX5->[*][H] : / Action ')
+    assert transition is None
+
+def test_transition_no_event_09():
+    transition_manager = TransitionManager()
+    transition = transition_manager.is_transition('StateX5->[*][H*] : / Action ')
+    assert transition is None
+
 def test_transition_01():
     transition_manager = TransitionManager()
     transition = transition_manager.is_transition('StateX1->StateY1:Event1/Action1')
@@ -187,3 +303,35 @@ def test_transition_05():
     assert transition.transition_type == '->'
     assert transition.event == 'Event5'
     assert transition.action == 'Action5'
+
+def test_transition_06():
+    transition_manager = TransitionManager()
+    transition = transition_manager.is_transition('  StateX2  -->  StateY2[H] : Event/Action ')
+    assert transition is not None
+    assert transition.state_from == 'StateX2'
+    assert transition.state_to == 'StateY2'
+    assert transition.transition_type == '-->'
+    assert transition.event == 'Event'
+    assert transition.action == 'Action'
+    assert transition.history == '[H]'
+
+def test_transition_07():
+    transition_manager = TransitionManager()
+    transition = transition_manager.is_transition('  StateX2  -->  StateY2[H*] : Event / Action ')
+    assert transition is not None
+    assert transition.state_from == 'StateX2'
+    assert transition.state_to == 'StateY2'
+    assert transition.transition_type == '-->'
+    assert transition.event == 'Event'
+    assert transition.action == 'Action'
+    assert transition.history == '[H*]'
+
+def test_transition_08():
+    transition_manager = TransitionManager()
+    transition = transition_manager.is_transition('StateX5->[*][H] : Event / Action ')
+    assert transition is None
+
+def test_transition_09():
+    transition_manager = TransitionManager()
+    transition = transition_manager.is_transition('StateX5->[*][H*] : Event / Action ')
+    assert transition is None
