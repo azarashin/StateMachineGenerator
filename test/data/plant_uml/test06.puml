@@ -7,8 +7,14 @@ State2 --> [*] : Aborted
 state State3 {
   [*] --> long1
   long1 --> long1 : NewData
-  long1 --> ProcessData : EnoughData
+  long1 --> State4 : EnoughData
   State2 --> [H]: Resume
+
+  state State4 {
+    [*] --> long2
+    long2 --> long2 : NewData
+    long2 --> ProcessData : EnoughData
+  }
 }
 State3 --> State2 : Pause
 State2 --> State3[H*]: DeepResume
