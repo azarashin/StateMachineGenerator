@@ -105,6 +105,49 @@ def test_transition_no_action_05():
     assert transition.event == 'Event5'
     assert transition.action is None
 
+
+
+
+def test_transition_no_event_01():
+    transition_manager = TransitionManager()
+    transition = transition_manager.is_transition('StateX1->StateY1:/Action1')
+    assert transition is not None
+    assert transition.state_from == 'StateX1'
+    assert transition.state_to == 'StateY1'
+    assert transition.transition_type == '->'
+    assert transition.event is None
+    assert transition.action == 'Action1'
+
+def test_transition_no_event_02():
+    transition_manager = TransitionManager()
+    transition = transition_manager.is_transition('  StateX2  -->  StateY2   :  /Action2  ')
+    assert transition is not None
+    assert transition.state_from == 'StateX2'
+    assert transition.state_to == 'StateY2'
+    assert transition.transition_type == '-->'
+    assert transition.event is None
+    assert transition.action == 'Action2'
+
+def test_transition_no_event_03():
+    transition_manager = TransitionManager()
+    transition = transition_manager.is_transition('  StateX3  - ->  StateY3   : /Action3')
+    assert transition is None
+
+def test_transition_no_event_04():
+    transition_manager = TransitionManager()
+    transition = transition_manager.is_transition('  [*]  -->  StateY4  :  /Action4')
+    assert transition is None
+
+def test_transition_no_event_05():
+    transition_manager = TransitionManager()
+    transition = transition_manager.is_transition('StateX5->[*]:/Action5')
+    assert transition is not None
+    assert transition.state_from == 'StateX5'
+    assert transition.state_to == '[*]'
+    assert transition.transition_type == '->'
+    assert transition.event is None
+    assert transition.action == 'Action5'
+
 def test_transition_01():
     transition_manager = TransitionManager()
     transition = transition_manager.is_transition('StateX1->StateY1:Event1/Action1')
