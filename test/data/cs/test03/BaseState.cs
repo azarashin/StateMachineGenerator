@@ -6,7 +6,7 @@ abstract public class BaseState
     {
         _controllee = controllee;
     }
-    public virtual void Setup()
+    public virtual void Setup(bool resume, bool deepResume)
     {
         return;
     }
@@ -29,12 +29,15 @@ abstract public class BaseState
     {
         return this;
     }
-    public void SetupSubState(BaseState? child)
+    public void SetupSubState(BaseState? child, bool resume)
     {
-        _currentSubState = child;
+        if(!resume)
+        {
+            _currentSubState = child;
+        }
         if(_currentSubState != null)
         {
-            _currentSubState.Setup();
+            _currentSubState.Setup(false, false);
         }
     }
     public BaseState? CurrentSubState()

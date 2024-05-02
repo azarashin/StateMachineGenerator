@@ -10,7 +10,7 @@ public class StateState31 : BaseState
     public override BaseState? TransitEvent431()
     {
         _controllee.DoAction431();
-        _stateController.InstanceOfState4.Setup();
+        _stateController.InstanceOfState4.Setup(false, false);
         return _stateController.InstanceOfState4;
     }
     public override string GetStateName()
