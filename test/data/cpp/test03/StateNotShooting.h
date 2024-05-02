@@ -9,7 +9,7 @@ private:
 public:
     StateNotShooting(StateController* stateController, IControllee* controllee);
     virtual ~StateNotShooting();
-    virtual void Setup();
+    virtual void Setup(bool resume, bool deepResume);
     virtual BaseState* TransitEscape();
     virtual BaseState* TransitEvConfig();
     virtual const char* GetStateName();

@@ -14,7 +14,7 @@ BaseState* StateState1::TransitCommand1()
 }
 BaseState* StateState1::TryTransitWithoutEvent()
 {
-    _stateController->InstanceOfState2->Setup();
+    _stateController->InstanceOfState2->Setup(false, false);
     return _stateController->InstanceOfState2;
 }
 const char* StateState1::GetStateName()

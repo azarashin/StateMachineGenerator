@@ -1,0 +1,108 @@
+abstract public class BaseState
+{
+    private IControllee _controllee;
+    private BaseState? _currentSubState;
+    public BaseState(IControllee controllee)
+    {
+        _controllee = controllee;
+    }
+    public virtual void Setup(bool resume, bool deepResume)
+    {
+        return;
+    }
+    public virtual BaseState? TransitAborted()
+    {
+        _controllee.NoTransition(GetStateName(), "Aborted");
+        return this;
+    }
+    public virtual BaseState? TransitDeepResume()
+    {
+        _controllee.NoTransition(GetStateName(), "DeepResume");
+        return this;
+    }
+    public virtual BaseState? TransitEnoughData()
+    {
+        _controllee.NoTransition(GetStateName(), "EnoughData");
+        return this;
+    }
+    public virtual BaseState? TransitFailed()
+    {
+        _controllee.NoTransition(GetStateName(), "Failed");
+        return this;
+    }
+    public virtual BaseState? TransitNewData()
+    {
+        _controllee.NoTransition(GetStateName(), "NewData");
+        return this;
+    }
+    public virtual BaseState? TransitPause()
+    {
+        _controllee.NoTransition(GetStateName(), "Pause");
+        return this;
+    }
+    public virtual BaseState? TransitResume()
+    {
+        _controllee.NoTransition(GetStateName(), "Resume");
+        return this;
+    }
+    public virtual BaseState? TransitSucceeded()
+    {
+        _controllee.NoTransition(GetStateName(), "Succeeded");
+        return this;
+    }
+    public virtual BaseState? TryTransitWithoutEvent()
+    {
+        return this;
+    }
+    public void SetupSubState(BaseState? child, bool resume)
+    {
+        if(!resume)
+        {
+            _currentSubState = child;
+        }
+        if(_currentSubState != null)
+        {
+            _currentSubState.Setup(false, false);
+        }
+    }
+    public BaseState? CurrentSubState()
+    {
+        return _currentSubState;
+    }
+    public BaseState? TransitBySubState(BaseState? nextState)
+    {
+        if(nextState == null || _currentSubState == null)
+        {
+            return nextState;
+        }
+        BaseState? parentOfNextState = _currentSubState.GetParent();
+        BaseState? parentOfCurrentState = nextState.GetParent();
+        if(parentOfNextState is not null && parentOfCurrentState is not null && parentOfNextState == parentOfCurrentState)
+        {
+            _currentSubState = nextState;
+            return this;
+        }
+        return nextState;
+    }
+    public BaseState? TransitForChild(BaseState? child)
+    {
+        _currentSubState = child;
+        BaseState? parent = GetParent();
+        if(parent != null)
+        {
+            return parent.TransitForChild(this);
+        }
+        return this;
+    }
+    public BaseState? OutlineState()
+    {
+        BaseState? parent = GetParent();
+        if(parent != null)
+        {
+            return parent.TransitForChild(this);
+        }
+        return this;
+    }
+    public abstract string GetStateName();
+    public abstract BaseState? GetParent();
+}

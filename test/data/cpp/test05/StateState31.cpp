@@ -10,7 +10,7 @@ StateState31::~StateState31()
 BaseState* StateState31::TransitEvent431()
 {
     _controllee->DoAction431();
-    _stateController->InstanceOfState4->Setup();
+    _stateController->InstanceOfState4->Setup(false, false);
     return _stateController->InstanceOfState4;
 }
 const char* StateState31::GetStateName()

@@ -62,7 +62,7 @@ class CPPGenerator:
 {{
 
 }}
-void {self._base_state_class_name}::Setup()
+void {self._base_state_class_name}::Setup(bool resume, bool deepResume)
 {{
 }} 
 {transition_list}
@@ -70,12 +70,15 @@ void {self._base_state_class_name}::Setup()
 {{
 \treturn this;
 }}
-void {self._base_state_class_name}::SetupSubState({self._base_state_class_name}* child)
+void {self._base_state_class_name}::SetupSubState({self._base_state_class_name}* child, bool resume)
 {{
-\t_currentSubState = child; 
+\tif(!resume)
+\t{{
+\t\t_currentSubState = child; 
+\t}}
 \tif(_currentSubState != 0)
 \t{{
-\t\t_currentSubState->Setup();
+\t\t_currentSubState->Setup(false, false);
 \t}}
 }}
 {self._base_state_class_name}* {self._base_state_class_name}::CurrentSubState()
@@ -134,10 +137,10 @@ private:
 public:
 \t{self._base_state_class_name}({self._icontrollee_class_name}* controllee);
 \tvirtual ~{self._base_state_class_name}();
-\tvirtual void Setup(); 
+\tvirtual void Setup(bool resume, bool deepResume); 
 {transition_list}
 \tvirtual {self._base_state_class_name}* TryTransitWithoutEvent();
-\tvoid SetupSubState({self._base_state_class_name}* child);
+\tvoid SetupSubState({self._base_state_class_name}* child, bool resume);
 \t{self._base_state_class_name}* CurrentSubState();
 \t{self._base_state_class_name}* TransitBySubState({self._base_state_class_name}* nextState);
 \t{self._base_state_class_name}* TransitForChild({self._base_state_class_name}* child);
@@ -170,7 +173,7 @@ public:
     def console_out_action_method_cpp(self, action):
         return f"""void {self._console_controllee_class_name}::{self._prefix_action_method}{action}()
 {{
-\tprintf("{action}");
+\tprintf("{action}\\n");
 }}
 """
 
@@ -195,12 +198,12 @@ public:
 {action_list}
 void {self._console_controllee_class_name}::NoTransition(const char* state, const char* transition)
 {{
-\tprintf("NoTransition(%s: %s)", state, transition);
+\tprintf("NoTransition(%s: %s)\\n", state, transition);
 }}
 
 void {self._console_controllee_class_name}::OverTransition(const char* transition)
 {{
-\tprintf("OverTransition(%s)", transition);
+\tprintf("OverTransition(%s)\\n", transition);
 }}
 """
         return ret
@@ -336,7 +339,16 @@ public:
 """
         return ret
     
-    def generate_transition_cpp(self, state, event, action, next_state, state_dic):
+    def generate_transition_cpp(self, state, event, action, next_state, history, state_dic):
+        if history == '[H]':
+            resume = 'true'
+            deepResume = 'false'
+        elif history == '[H*]':
+            resume = 'true'
+            deepResume = 'true'
+        else:
+            resume = 'false'
+            deepResume = 'false'
         if action is None:
             action_sequence = ""
         else:
@@ -346,7 +358,7 @@ public:
             setup_sequence = ""
             next_state_sequence = "\treturn 0;"
         else:
-            setup_sequence = f'\t_stateController->{self._prefix_instance_of}{next_state}->Setup();'
+            setup_sequence = f'\t_stateController->{self._prefix_instance_of}{next_state}->Setup({resume}, {deepResume});'
             next_state_sequence = f"\treturn _stateController->{self._prefix_instance_of}{next_state};"
         transition_name = f'{self._prefix_method}{event}'
         if event is None:
@@ -391,7 +403,7 @@ public:
 
     def generate_state_class_cpp(self, state, state_manager, transitions, state_dic):
         target_transitions = [d for d in transitions if d.state_from == state.name]
-        transition_codes = '\n'.join([self.generate_transition_cpp(state, d.event, d.action, d.state_to, state_dic) for d in sorted(target_transitions, key=lambda x: x.get_event_as_key())])
+        transition_codes = '\n'.join([self.generate_transition_cpp(state, d.event, d.action, d.state_to, d.history, state_dic) for d in sorted(target_transitions, key=lambda x: x.get_event_as_key())])
         setup_code = ""
         sub_transition_codes = ""
         state_name = f"""
@@ -402,9 +414,12 @@ const char* {self._prefix_state}{state.name}::GetStateName()
 """
         if state.initial_state:
             setup_code = f"""
-void {self._prefix_state}{state.name}::Setup()
+void {self._prefix_state}{state.name}::Setup(bool resume, bool deepResume)
 {{
-\t\tSetupSubState(_stateController->InstanceOf{state.initial_state});
+\tif(!deepResume)
+\t{{
+\t\tSetupSubState(_stateController->{self._prefix_instance_of}{state.initial_state}, resume);
+\t}}
 }}
 """
             sub_transitions = state_manager.get_all_transitions_under_the_state(state.name)
@@ -455,7 +470,7 @@ const char* {self._prefix_state}{state.name}::GetStateName()
         setup_code = ""
         sub_transition_codes = ""
         if state.initial_state:
-            setup_code = f"""\tvirtual void Setup(); """
+            setup_code = f"""\tvirtual void Setup(bool resume, bool deepResume); """
             sub_transitions = state_manager.get_all_transitions_under_the_state(state.name)
             sub_transition_codes = '\n'.join([self.generate_sub_transitions_h(d) for d in sorted(sub_transitions, key=lambda x: x)])
             

@@ -7,14 +7,17 @@ public class StateState21 : BaseState
         _stateController = stateController;
         _controllee = controllee;
     }
-    public override void Setup()
+    public override void Setup(bool resume, bool deepResume)
     {
-        SetupSubState(_stateController.InstanceOfState31);
+        if(!deepResume)
+        {
+            SetupSubState(_stateController.InstanceOfState31, resume);
+        }
     }
     public override BaseState? TransitEvent421()
     {
         _controllee.DoAction421();
-        _stateController.InstanceOfState4.Setup();
+        _stateController.InstanceOfState4.Setup(false, false);
         return _stateController.InstanceOfState4;
     }
     public override BaseState? TransitEvent431()

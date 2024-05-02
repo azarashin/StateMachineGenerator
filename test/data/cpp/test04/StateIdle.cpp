@@ -10,7 +10,7 @@ StateIdle::~StateIdle()
 BaseState* StateIdle::TransitEvConfig()
 {
     _controllee->DoAction1();
-    _stateController->InstanceOfConfiguring->Setup();
+    _stateController->InstanceOfConfiguring->Setup(false, false);
     return _stateController->InstanceOfConfiguring;
 }
 const char* StateIdle::GetStateName()

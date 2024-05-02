@@ -6,7 +6,7 @@ BaseState::BaseState(IControllee* controllee)
 BaseState::~BaseState()
 {
 }
-void BaseState::Setup()
+void BaseState::Setup(bool resume, bool deepResume)
 {
 }
 BaseState* BaseState::TransitEscape()
@@ -28,12 +28,15 @@ BaseState* BaseState::TryTransitWithoutEvent()
 {
     return this;
 }
-void BaseState::SetupSubState(BaseState* child)
+void BaseState::SetupSubState(BaseState* child, bool resume)
 {
-    _currentSubState = child;
+    if(!resume)
+    {
+        _currentSubState = child;
+    }
     if(_currentSubState != 0)
     {
-        _currentSubState->Setup();
+        _currentSubState->Setup(false, false);
     }
 }
 BaseState* BaseState::CurrentSubState()

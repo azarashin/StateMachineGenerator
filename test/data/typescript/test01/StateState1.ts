@@ -23,7 +23,7 @@ export class StateState1 extends BaseState
     public TransitCommand2(): BaseState | null
     {
         this._controlleeImp.DoAction2();
-        this._stateController.InstanceOfState2.Setup();
+        this._stateController.InstanceOfState2.Setup(false, false);
         return this._stateController.InstanceOfState2;
     }
     public  GetStateName(): string

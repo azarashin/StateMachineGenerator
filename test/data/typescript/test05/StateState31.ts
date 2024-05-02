@@ -14,7 +14,7 @@ export class StateState31 extends BaseState
     public TransitEvent431(): BaseState | null
     {
         this._controlleeImp.DoAction431();
-        this._stateController.InstanceOfState4.Setup();
+        this._stateController.InstanceOfState4.Setup(false, false);
         return this._stateController.InstanceOfState4;
     }
     public  GetStateName(): string

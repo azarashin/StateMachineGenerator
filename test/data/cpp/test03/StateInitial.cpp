@@ -10,7 +10,7 @@ StateInitial::~StateInitial()
 BaseState* StateInitial::TransitGoInTo()
 {
     _controllee->DoAction0();
-    _stateController->InstanceOfNotShooting->Setup();
+    _stateController->InstanceOfNotShooting->Setup(false, false);
     return _stateController->InstanceOfNotShooting;
 }
 const char* StateInitial::GetStateName()

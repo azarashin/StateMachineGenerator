@@ -54,7 +54,7 @@ export abstract class {self._base_state_class_name}
 \t\tthis._controllee = controllee;
 \t\tthis._currentSubState = null; 
 \t}}
-\tpublic Setup(): void
+\tpublic Setup(resume: boolean, deepResume: boolean): void
 \t{{
 \t\treturn;
 \t}}
@@ -63,12 +63,15 @@ export abstract class {self._base_state_class_name}
 \t{{
 \t\treturn this;
 \t}}
-\tpublic SetupSubState(child: {self._base_state_class_name}): void
+\tpublic SetupSubState(child: {self._base_state_class_name}, resume: boolean): void
 \t{{
-\t\tthis._currentSubState = child; 
+\t\tif(!resume)
+\t\t{{
+\t\t\tthis._currentSubState = child; 
+\t\t}}
 \t\tif(this._currentSubState != null)
 \t\t{{
-\t\t\tthis._currentSubState.Setup();
+\t\t\tthis._currentSubState.Setup(false, false);
 \t\t}}
 \t}}
 \tpublic CurrentSubState(): {self._base_state_class_name} | null
@@ -238,7 +241,16 @@ export class {self._state_controller_class_name}
 """
         return ret
     
-    def generate_transition(self, event, action, next_state, state_dic):
+    def generate_transition(self, event, action, next_state, history, state_dic):
+        if history == '[H]':
+            resume = 'true'
+            deepResume = 'false'
+        elif history == '[H*]':
+            resume = 'true'
+            deepResume = 'true'
+        else:
+            resume = 'false'
+            deepResume = 'false'
         if action is None:
             action_sequence = ""
         else:
@@ -248,7 +260,7 @@ export class {self._state_controller_class_name}
             setup_sequence = ""
             next_state_sequence = "\t\treturn null;"
         else:
-            setup_sequence = f'\t\tthis._stateController.{self._prefix_instance_of}{next_state}.Setup();'
+            setup_sequence = f'\t\tthis._stateController.{self._prefix_instance_of}{next_state}.Setup({resume}, {deepResume});'
             next_state_sequence = f"\t\treturn this._stateController.{self._prefix_instance_of}{next_state};"
         transition_name = f'{self._prefix_method}{event}'
         if event is None:
@@ -279,7 +291,7 @@ export class {self._state_controller_class_name}
 
     def generate_state_class(self, state, state_manager, transitions, state_dic):
         target_transitions = [d for d in transitions if d.state_from == state.name]
-        transition_codes = '\n'.join([self.generate_transition(d.event, d.action, d.state_to, state_dic) for d in sorted(target_transitions, key=lambda x: x.get_event_as_key())])
+        transition_codes = '\n'.join([self.generate_transition(d.event, d.action, d.state_to, d.history, state_dic) for d in sorted(target_transitions, key=lambda x: x.get_event_as_key())])
         description_body = ''
         if state.description is None or state.description.strip() == '':
             pass
@@ -300,9 +312,12 @@ export class {self._state_controller_class_name}
 """
         if state.initial_state:
             setup_code = f"""
-\tpublic Setup(): void
+\tpublic Setup(resume: boolean, deepResume: boolean): void
 \t{{
-\t\tthis.SetupSubState(this._stateController.InstanceOf{state.initial_state});
+\t\tif(!deepResume)
+\t\t{{
+\t\t\tthis.SetupSubState(this._stateController.{self._prefix_instance_of}{state.initial_state}, resume);
+\t\t}}
 \t}}
 """
             sub_transitions = state_manager.get_all_transitions_under_the_state(state.name)

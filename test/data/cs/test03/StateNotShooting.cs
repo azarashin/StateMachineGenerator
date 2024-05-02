@@ -7,14 +7,17 @@ public class StateNotShooting : BaseState
         _stateController = stateController;
         _controllee = controllee;
     }
-    public override void Setup()
+    public override void Setup(bool resume, bool deepResume)
     {
-        SetupSubState(_stateController.InstanceOfIdle);
+        if(!deepResume)
+        {
+            SetupSubState(_stateController.InstanceOfIdle, resume);
+        }
     }
     public override BaseState? TransitEscape()
     {
         _controllee.DoAction3();
-        _stateController.InstanceOfEscaped.Setup();
+        _stateController.InstanceOfEscaped.Setup(false, false);
         return _stateController.InstanceOfEscaped;
     }
     public override BaseState? TransitEvConfig()

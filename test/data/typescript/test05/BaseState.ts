@@ -8,7 +8,7 @@ export abstract class BaseState
         this._controllee = controllee;
         this._currentSubState = null;
     }
-    public Setup(): void
+    public Setup(resume: boolean, deepResume: boolean): void
     {
         return;
     }
@@ -46,12 +46,15 @@ export abstract class BaseState
     {
         return this;
     }
-    public SetupSubState(child: BaseState): void
+    public SetupSubState(child: BaseState, resume: boolean): void
     {
-        this._currentSubState = child;
+        if(!resume)
+        {
+            this._currentSubState = child;
+        }
         if(this._currentSubState != null)
         {
-            this._currentSubState.Setup();
+            this._currentSubState.Setup(false, false);
         }
     }
     public CurrentSubState(): BaseState | null

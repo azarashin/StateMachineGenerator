@@ -10,19 +10,19 @@ public class StateState1 : BaseState
     public override BaseState? TransitEvent2()
     {
         _controllee.DoAction2();
-        _stateController.InstanceOfState2.Setup();
+        _stateController.InstanceOfState2.Setup(false, false);
         return _stateController.InstanceOfState2;
     }
     public override BaseState? TransitEvent21()
     {
         _controllee.DoAction21();
-        _stateController.InstanceOfState21.Setup();
+        _stateController.InstanceOfState21.Setup(false, false);
         return _stateController.InstanceOfState21;
     }
     public override BaseState? TransitEvent31()
     {
         _controllee.DoAction31();
-        _stateController.InstanceOfState31.Setup();
+        _stateController.InstanceOfState31.Setup(false, false);
         return _stateController.InstanceOfState31;
     }
     public override string GetStateName()
