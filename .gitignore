@@ -160,3 +160,4 @@ cython_debug/
 #.idea/
 test/data/cs/**/obj/*
 test/data/cs/**/bin/*
+node_modules/
