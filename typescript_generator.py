@@ -114,6 +114,7 @@ export abstract class {self._base_state_class_name}
 \t}}
 \tpublic abstract GetStateName(): string;
 \tpublic abstract GetParent(): {self._base_state_class_name} | null;
+\tpublic abstract GetID(): int;
 }}
         """
         return ret

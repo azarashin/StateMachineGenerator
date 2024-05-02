@@ -111,6 +111,7 @@ abstract public class {self._base_state_class_name}
 \t}}
 \tpublic abstract string GetStateName();
 \tpublic abstract {self._base_state_class_name}? GetParent();
+\tpublic abstract int GetID();
 }}
         """
         return ret

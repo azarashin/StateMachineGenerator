@@ -147,6 +147,7 @@ public:
 \t{self._base_state_class_name}* OutlineState();
 \tvirtual const char* GetStateName() = 0;
 \tvirtual {self._base_state_class_name}* GetParent() = 0;
+\tvirtual int GetID() = 0;
 }};
         """
         return ret
