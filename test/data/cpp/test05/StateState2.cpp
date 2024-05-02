@@ -7,14 +7,17 @@ StateState2::StateState2(StateController* stateController, IControllee* controll
 StateState2::~StateState2()
 {
 }
-void StateState2::Setup()
+void StateState2::Setup(bool resume, bool deepResume)
 {
-        SetupSubState(_stateController->InstanceOfState21);
+    if(!deepResume)
+    {
+        SetupSubState(_stateController->InstanceOfState21, resume);
+    }
 }
 BaseState* StateState2::TransitEvent42()
 {
     _controllee->DoAction42();
-    _stateController->InstanceOfState4->Setup();
+    _stateController->InstanceOfState4->Setup(false, false);
     return _stateController->InstanceOfState4;
 }
 BaseState* StateState2::TransitEvent421()

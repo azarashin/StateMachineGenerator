@@ -7,14 +7,17 @@ StateNotShooting::StateNotShooting(StateController* stateController, IControllee
 StateNotShooting::~StateNotShooting()
 {
 }
-void StateNotShooting::Setup()
+void StateNotShooting::Setup(bool resume, bool deepResume)
 {
-        SetupSubState(_stateController->InstanceOfIdle);
+    if(!deepResume)
+    {
+        SetupSubState(_stateController->InstanceOfIdle, resume);
+    }
 }
 BaseState* StateNotShooting::TransitEscape()
 {
     _controllee->DoAction3();
-    _stateController->InstanceOfEscaped->Setup();
+    _stateController->InstanceOfEscaped->Setup(false, false);
     return _stateController->InstanceOfEscaped;
 }
 BaseState* StateNotShooting::TransitEvConfig()

@@ -8,12 +8,12 @@ private:
 public:
     BaseState(IControllee* controllee);
     virtual ~BaseState();
-    virtual void Setup();
+    virtual void Setup(bool resume, bool deepResume);
     virtual BaseState* TransitCommand1();
     virtual BaseState* TransitCommand2();
     virtual BaseState* TransitCommand3();
     virtual BaseState* TryTransitWithoutEvent();
-    void SetupSubState(BaseState* child);
+    void SetupSubState(BaseState* child, bool resume);
     BaseState* CurrentSubState();
     BaseState* TransitBySubState(BaseState* nextState);
     BaseState* TransitForChild(BaseState* child);

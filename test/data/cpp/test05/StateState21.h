@@ -9,7 +9,7 @@ private:
 public:
     StateState21(StateController* stateController, IControllee* controllee);
     virtual ~StateState21();
-    virtual void Setup();
+    virtual void Setup(bool resume, bool deepResume);
     virtual BaseState* TransitEvent421();
     virtual BaseState* TransitEvent431();
     virtual const char* GetStateName();

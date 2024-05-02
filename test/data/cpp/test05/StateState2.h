@@ -9,7 +9,7 @@ private:
 public:
     StateState2(StateController* stateController, IControllee* controllee);
     virtual ~StateState2();
-    virtual void Setup();
+    virtual void Setup(bool resume, bool deepResume);
     virtual BaseState* TransitEvent42();
     virtual BaseState* TransitEvent421();
     virtual BaseState* TransitEvent431();
