@@ -11,14 +11,17 @@ export class StateState21 extends BaseState
         this._stateController = stateController;
         this._controlleeImp = controllee;
     }
-    public Setup(): void
+    public Setup(resume: boolean, deepResume: boolean): void
     {
-        this.SetupSubState(this._stateController.InstanceOfState31);
+        if(!deepResume)
+        {
+            this.SetupSubState(this._stateController.InstanceOfState31, resume);
+        }
     }
     public TransitEvent421(): BaseState | null
     {
         this._controlleeImp.DoAction421();
-        this._stateController.InstanceOfState4.Setup();
+        this._stateController.InstanceOfState4.Setup(false, false);
         return this._stateController.InstanceOfState4;
     }
     public TransitEvent431(): BaseState | null

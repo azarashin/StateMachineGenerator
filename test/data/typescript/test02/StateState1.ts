@@ -22,7 +22,7 @@ export class StateState1 extends BaseState
     }
     public TryTransitWithoutEvent(): BaseState | null
     {
-        this._stateController.InstanceOfState2.Setup();
+        this._stateController.InstanceOfState2.Setup(false, false);
         return this._stateController.InstanceOfState2;
     }
     public  GetStateName(): string

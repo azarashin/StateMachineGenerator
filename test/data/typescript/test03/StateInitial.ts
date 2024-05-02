@@ -14,7 +14,7 @@ export class StateInitial extends BaseState
     public TransitGoInTo(): BaseState | null
     {
         this._controlleeImp.DoAction0();
-        this._stateController.InstanceOfNotShooting.Setup();
+        this._stateController.InstanceOfNotShooting.Setup(false, false);
         return this._stateController.InstanceOfNotShooting;
     }
     public  GetStateName(): string

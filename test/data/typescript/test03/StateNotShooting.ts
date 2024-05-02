@@ -11,14 +11,17 @@ export class StateNotShooting extends BaseState
         this._stateController = stateController;
         this._controlleeImp = controllee;
     }
-    public Setup(): void
+    public Setup(resume: boolean, deepResume: boolean): void
     {
-        this.SetupSubState(this._stateController.InstanceOfIdle);
+        if(!deepResume)
+        {
+            this.SetupSubState(this._stateController.InstanceOfIdle, resume);
+        }
     }
     public TransitEscape(): BaseState | null
     {
         this._controlleeImp.DoAction3();
-        this._stateController.InstanceOfEscaped.Setup();
+        this._stateController.InstanceOfEscaped.Setup(false, false);
         return this._stateController.InstanceOfEscaped;
     }
     public TransitEvConfig(): BaseState | null

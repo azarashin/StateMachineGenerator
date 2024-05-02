@@ -14,7 +14,7 @@ export class StateConfiguring extends BaseState
     public TransitEvConfig(): BaseState | null
     {
         this._controlleeImp.DoAction2();
-        this._stateController.InstanceOfIdle.Setup();
+        this._stateController.InstanceOfIdle.Setup(false, false);
         return this._stateController.InstanceOfIdle;
     }
     public  GetStateName(): string
