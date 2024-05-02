@@ -1,0 +1,18 @@
+@startuml
+[*] -> State1
+State1 --> State2 : Succeeded
+State1 --> [*] : Aborted
+State2 --> State3 : Succeeded
+State2 --> [*] : Aborted
+state State3 {
+  [*] --> long1
+  long1 --> long1 : NewData
+  long1 --> ProcessData : EnoughData
+  State2 --> [H]: Resume
+}
+State3 --> State2 : Pause
+State2 --> State3[H*]: DeepResume
+State3 --> State3 : Failed
+State3 --> [*] : Succeeded / SaveResult
+State3 --> [*] : Aborted
+@enduml
