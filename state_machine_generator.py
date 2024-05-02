@@ -5,6 +5,8 @@ from code_filter import filter_code
 
 from state import StateManager
 from cs_generator import CSGenerator
+from cpp_generator import CPPGenerator
+from typescript_generator import TypeScriptGenerator
 
 class StateMachineGenerator:
     
@@ -39,7 +41,7 @@ def get_args():
     if sys.stdin.isatty():
         parser.add_argument("puml", help="path to .puml file", type=str)
 
-    parser.add_argument("--mode", type=str, required=True, help="cs: C#\n")
+    parser.add_argument("--mode", type=str, required=True, help="cs: C#, cpp: C++, tp: TypeScript\n")
     parser.add_argument("--output", type=str, required=True, help="path to output directory")
 
     args = parser.parse_args()
@@ -63,6 +65,10 @@ if __name__ == '__main__':
 
     if mode == 'cs':
         code_generator = CSGenerator()
+    if mode == 'cpp':
+        code_generator = CPPGenerator()
+    if mode == 'ts':
+        code_generator = TypeScriptGenerator()
 
     if code_generator is not None:
         if not os.path.exists(output_dir):
