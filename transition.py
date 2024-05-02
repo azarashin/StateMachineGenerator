@@ -25,7 +25,7 @@ class TransitionManager:
         self._transition_no_action = re.compile("\s*(\w+)\s*(-+>)\s*(\w*|\[\*\])(\[H\]|\[H\*\]|)\s*:\s*(\w+)\s*$")
         self._transition = re.compile("\s*(\w+)\s*(-+>)\s*(\w*|\[\*\])(\[H\]|\[H\*\]|)\s*:\s*(\w+)\s*/\s*(\w+)\s*$")
 
-    def is_initial_transition(self, line):
+    def is_initial_transition(self, line, parent_name):
         m = self._initial_transition.search(line)
         if m:
             state_from = None
@@ -34,12 +34,17 @@ class TransitionManager:
             history = m.group(3)
             event = None
             action = None
+            if state_to.strip() == '':
+                if parent_name:
+                    state_to = parent_name
+                else:
+                    return None
             if history.strip() == '':
                 history = None
             return Transition(state_from, state_to, transition, history, event, action)
         return None
 
-    def is_transition(self, line):
+    def is_transition(self, line, parent_name):
         state_from = None
         m0 = self._transition_no_event_no_action.search(line)
         if m0:
@@ -74,6 +79,11 @@ class TransitionManager:
             event = m3.group(5)
             action = m3.group(6)
         if state_from:
+            if state_to.strip() == '':
+                if parent_name:
+                    state_to = parent_name
+                else:
+                    return None
             if state_to.strip() == '':
                 state_to = None
             if event.strip() == '':

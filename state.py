@@ -38,8 +38,10 @@ class StateManager:
             if m_end_of_sub_state:
                 parent = parent.parent
             
-            
-            transition = transition_manager.is_initial_transition(line)
+            parent_name = None
+            if parent:
+                parent_name = parent.name
+            transition = transition_manager.is_initial_transition(line, parent_name)
             if transition:
                 initial = self._setup_state(transition.state_to, parent)
                 if parent is None:
@@ -49,7 +51,7 @@ class StateManager:
                 if not self._contains_transition(transition, self._transitions):
                     self._transitions.append(transition)
                 
-            transition = transition_manager.is_transition(line)
+            transition = transition_manager.is_transition(line, parent_name)
             if transition:
                 self._setup_state(transition.state_from, parent)
                 self._setup_state(transition.state_to, parent)
@@ -65,7 +67,7 @@ class StateManager:
 
     def _contains_transition(self, target_transition, all_transition):
         for transition in all_transition:
-            if transition.state_from == target_transition.state_from and transition.state_to == target_transition.state_to:
+            if transition.state_from == target_transition.state_from and transition.state_to == target_transition.state_to and transition.event == target_transition.event:
                 return True
         return False
                     
