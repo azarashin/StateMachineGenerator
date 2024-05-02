@@ -19,11 +19,11 @@ class Transition:
 class TransitionManager:
     
     def __init__(self):
-        self._initial_transition = re.compile("\s*\[\*\]\s*(-+>)\s*(\w*)(\(H\)|\(H\*\)|)\s*$")
-        self._transition_no_event_no_action = re.compile("\s*(\w+)\s*(-+>)\s*(\w*|\[\*\])(\(H\)|\(H\*\)|)\s*$")
-        self._transition_no_event = re.compile("\s*(\w+)\s*(-+>)\s*(\w*|\[\*\])(\(H\)|\(H\*\)|)\s*:\s*/\s*(\w+)\s*$")
-        self._transition_no_action = re.compile("\s*(\w+)\s*(-+>)\s*(\w*|\[\*\])(\(H\)|\(H\*\)|)\s*:\s*(\w+)\s*$")
-        self._transition = re.compile("\s*(\w+)\s*(-+>)\s*(\w*|\[\*\])(\(H\)|\(H\*\)|)\s*:\s*(\w+)\s*/\s*(\w+)\s*$")
+        self._initial_transition = re.compile("\s*\[\*\]\s*(-+>)\s*(\w*)(\[H\]|\[H\*\]|)\s*$")
+        self._transition_no_event_no_action = re.compile("\s*(\w+)\s*(-+>)\s*(\w*|\[\*\])(\[H\]|\[H\*\]|)\s*$")
+        self._transition_no_event = re.compile("\s*(\w+)\s*(-+>)\s*(\w*|\[\*\])(\[H\]|\[H\*\]|)\s*:\s*/\s*(\w+)\s*$")
+        self._transition_no_action = re.compile("\s*(\w+)\s*(-+>)\s*(\w*|\[\*\])(\[H\]|\[H\*\]|)\s*:\s*(\w+)\s*$")
+        self._transition = re.compile("\s*(\w+)\s*(-+>)\s*(\w*|\[\*\])(\[H\]|\[H\*\]|)\s*:\s*(\w+)\s*/\s*(\w+)\s*$")
 
     def is_initial_transition(self, line):
         m = self._initial_transition.search(line)
@@ -34,6 +34,8 @@ class TransitionManager:
             history = m.group(3)
             event = None
             action = None
+            if history.strip() == '':
+                history = None
             return Transition(state_from, state_to, transition, history, event, action)
         return None
 
@@ -78,5 +80,9 @@ class TransitionManager:
                 event = None
             if action.strip() == '':
                 action = None
+            if history.strip() == '':
+                history = None
+            if history is not None and state_to == '[*]':
+                return None
             return Transition(state_from, state_to, transition, history, event, action)
         return None
