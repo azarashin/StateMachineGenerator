@@ -170,7 +170,7 @@ public:
     def console_out_action_method_cpp(self, action):
         return f"""void {self._console_controllee_class_name}::{self._prefix_action_method}{action}()
 {{
-\tprintf("{action}");
+\tprintf("{action}\\n");
 }}
 """
 
@@ -195,12 +195,12 @@ public:
 {action_list}
 void {self._console_controllee_class_name}::NoTransition(const char* state, const char* transition)
 {{
-\tprintf("NoTransition(%s: %s)", state, transition);
+\tprintf("NoTransition(%s: %s)\\n", state, transition);
 }}
 
 void {self._console_controllee_class_name}::OverTransition(const char* transition)
 {{
-\tprintf("OverTransition(%s)", transition);
+\tprintf("OverTransition(%s)\\n", transition);
 }}
 """
         return ret
