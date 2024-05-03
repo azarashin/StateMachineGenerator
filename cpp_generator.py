@@ -57,6 +57,7 @@ class CPPGenerator:
 {self._base_state_class_name}::{self._base_state_class_name}({self._icontrollee_class_name}* controllee)
 {{
 \t_controllee = controllee;
+\t_currentSubState = nullptr;
 }}
 {self._base_state_class_name}::~{self._base_state_class_name}()
 {{
@@ -76,7 +77,7 @@ void {self._base_state_class_name}::SetupSubState({self._base_state_class_name}*
 \t{{
 \t\t_currentSubState = child; 
 \t}}
-\tif(_currentSubState != 0)
+\tif(_currentSubState != nullptr)
 \t{{
 \t\t_currentSubState->Setup(false, false);
 \t}}
@@ -87,13 +88,13 @@ void {self._base_state_class_name}::SetupSubState({self._base_state_class_name}*
 }}
 {self._base_state_class_name}* {self._base_state_class_name}::TransitBySubState({self._base_state_class_name}* nextState)
 {{
-\tif(nextState == 0 || _currentSubState == 0)
+\tif(nextState == nullptr || _currentSubState == nullptr)
 \t{{
 \t\treturn nextState;
 \t}}
 \t{self._base_state_class_name}* parentOfNextState = _currentSubState->GetParent();
 \t{self._base_state_class_name}* parentOfCurrentState = nextState->GetParent();
-\tif(parentOfNextState != 0 && parentOfCurrentState != 0 && parentOfNextState == parentOfCurrentState)
+\tif(parentOfNextState != nullptr && parentOfCurrentState != nullptr && parentOfNextState == parentOfCurrentState)
 \t{{
 \t\t_currentSubState = nextState;
 \t\treturn this;
@@ -104,7 +105,7 @@ void {self._base_state_class_name}::SetupSubState({self._base_state_class_name}*
 {{
 \t_currentSubState = child;
 \t{self._base_state_class_name}* parent = GetParent();
-\tif(parent != 0)
+\tif(parent != nullptr)
 \t{{
 \t\treturn parent->TransitForChild(this);
 \t}}
@@ -113,7 +114,7 @@ void {self._base_state_class_name}::SetupSubState({self._base_state_class_name}*
 {self._base_state_class_name}* {self._base_state_class_name}::OutlineState()
 {{
 \t{self._base_state_class_name}* parent = GetParent();
-\tif(parent != 0)
+\tif(parent != nullptr)
 \t{{
 \t\treturn parent->TransitForChild(this);
 \t}}
@@ -245,10 +246,10 @@ public:
     def transition_method_in_state_controller_cpp(self, event):
         return f"""void {self._state_controller_class_name}::{self._prefix_method}{event}()
 {{
-\tif(_currentState != 0)
+\tif(_currentState != nullptr)
 \t{{
 \t\t_currentState = _currentState->{self._prefix_method}{event}();
-\t\tif(_currentState != 0)
+\t\tif(_currentState != nullptr)
 \t\t{{
 \t\t\t_currentState = _currentState->OutlineState();
 \t\t}}
@@ -281,13 +282,13 @@ public:
 }}
 bool {self._state_controller_class_name}::TryTransitWithoutEvent()
 {{
-\tif(_currentState == 0)
+\tif(_currentState == nullptr)
 \t{{
 \t\treturn false; 
 \t}}
 \t{self._base_state_class_name}* current = _currentState; 
 \t_currentState = _currentState->TryTransitWithoutEvent();
-\tif(_currentState != 0)
+\tif(_currentState != nullptr)
 \t{{
 \t\t_currentState = _currentState->OutlineState();
 \t}}
@@ -296,7 +297,7 @@ bool {self._state_controller_class_name}::TryTransitWithoutEvent()
 {transition_list}
 const char* {self._state_controller_class_name}::GetCurrentStateName()
 {{
-\tif(_currentState == 0)
+\tif(_currentState == nullptr)
 \t{{
 \t\treturn "(end)";
 \t}}
@@ -357,7 +358,7 @@ public:
             
         if next_state == "[*]":
             setup_sequence = ""
-            next_state_sequence = "\treturn 0;"
+            next_state_sequence = "\treturn nullptr;"
         else:
             setup_sequence = f'\t_stateController->{self._prefix_instance_of}{next_state}->Setup({resume}, {deepResume});'
             next_state_sequence = f"\treturn _stateController->{self._prefix_instance_of}{next_state};"
@@ -429,7 +430,7 @@ void {self._prefix_state}{state.name}::Setup(bool resume, bool deepResume)
 const char* {self._prefix_state}{state.name}::GetStateName()
 {{
 \t{self._base_state_class_name}* currentSubState = CurrentSubState();
-\tif(currentSubState == 0)
+\tif(currentSubState == nullptr)
 \t{{
 \t\treturn "{state.get_full_name()}(end)";
 \t}}
@@ -440,7 +441,7 @@ const char* {self._prefix_state}{state.name}::GetStateName()
         if state.parent:
             parent = f'_stateController->{self._prefix_instance_of}{state.parent.name}'
         else:
-            parent = '0'
+            parent = 'nullptr'
         
         ret = f"""#include "{self._prefix_state}{state.name}.h"
 
