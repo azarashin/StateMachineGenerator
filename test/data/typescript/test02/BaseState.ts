@@ -70,6 +70,11 @@ export abstract class BaseState
         }
         return this;
     }
+    public ResumeSubState(subState: BaseState | null): void
+    {
+        this._currentSubState = subState;
+    }
     public abstract GetStateName(): string;
     public abstract GetParent(): BaseState | null;
+    public abstract GetStateID(): number;
 }

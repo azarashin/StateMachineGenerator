@@ -47,4 +47,8 @@ export class StateState21 extends BaseState
     {
         return this._stateController.InstanceOfState2;
     }
+    public GetStateID(): number
+    {
+        return 2;
+    }
 }

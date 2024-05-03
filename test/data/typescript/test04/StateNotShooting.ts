@@ -47,4 +47,8 @@ export class StateNotShooting extends BaseState
     {
         return null;
     }
+    public GetStateID(): number
+    {
+        return 4;
+    }
 }

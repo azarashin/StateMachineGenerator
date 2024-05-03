@@ -19,4 +19,8 @@ export class StateProcessData extends BaseState
     {
         return this._stateController.InstanceOfState4;
     }
+    public GetStateID(): number
+    {
+        return 0;
+    }
 }

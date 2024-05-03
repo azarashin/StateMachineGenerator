@@ -19,4 +19,8 @@ export class StateEscaped extends BaseState
     {
         return null;
     }
+    public GetStateID(): number
+    {
+        return 1;
+    }
 }
