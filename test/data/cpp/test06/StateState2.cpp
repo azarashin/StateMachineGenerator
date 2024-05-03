@@ -9,7 +9,7 @@ StateState2::~StateState2()
 }
 BaseState* StateState2::TransitAborted()
 {
-    return 0;
+    return nullptr;
 }
 BaseState* StateState2::TransitDeepResume()
 {
@@ -32,7 +32,7 @@ const char* StateState2::GetStateName()
 }
 BaseState* StateState2::GetParent()
 {
-    return 0;
+    return nullptr;
 }
 int StateState2::GetStateID()
 {

@@ -46,7 +46,7 @@ int StateController::GetCurrentIdFromStateId(int parentStateId)
 }
 int StateController::GetCurrentIdFromState(BaseState* state)
 {
-    if(state == 0)
+    if(state == nullptr)
     {
         return -1;
     }
@@ -54,7 +54,7 @@ int StateController::GetCurrentIdFromState(BaseState* state)
     }
 void StateController::ResumeState(int parentStateId, int stateId)
 {
-    BaseState* state = 0;
+    BaseState* state = nullptr;
     if(stateId >= 0 && stateId < MaxNumberOfStateIDs)
     {
         state = _stateList[stateId];
@@ -80,13 +80,13 @@ const char* StateController::StateName(int parentStateId)
 }
 bool StateController::TryTransitWithoutEvent()
 {
-    if(_currentState == 0)
+    if(_currentState == nullptr)
     {
         return false;
     }
     BaseState* current = _currentState;
     _currentState = _currentState->TryTransitWithoutEvent();
-    if(_currentState != 0)
+    if(_currentState != nullptr)
     {
         _currentState = _currentState->OutlineState();
     }
@@ -94,10 +94,10 @@ bool StateController::TryTransitWithoutEvent()
 }
 void StateController::TransitAborted()
 {
-    if(_currentState != 0)
+    if(_currentState != nullptr)
     {
         _currentState = _currentState->TransitAborted();
-        if(_currentState != 0)
+        if(_currentState != nullptr)
         {
             _currentState = _currentState->OutlineState();
         }
@@ -107,10 +107,10 @@ void StateController::TransitAborted()
 }
 void StateController::TransitDeepResume()
 {
-    if(_currentState != 0)
+    if(_currentState != nullptr)
     {
         _currentState = _currentState->TransitDeepResume();
-        if(_currentState != 0)
+        if(_currentState != nullptr)
         {
             _currentState = _currentState->OutlineState();
         }
@@ -120,10 +120,10 @@ void StateController::TransitDeepResume()
 }
 void StateController::TransitEnoughData()
 {
-    if(_currentState != 0)
+    if(_currentState != nullptr)
     {
         _currentState = _currentState->TransitEnoughData();
-        if(_currentState != 0)
+        if(_currentState != nullptr)
         {
             _currentState = _currentState->OutlineState();
         }
@@ -133,10 +133,10 @@ void StateController::TransitEnoughData()
 }
 void StateController::TransitFailed()
 {
-    if(_currentState != 0)
+    if(_currentState != nullptr)
     {
         _currentState = _currentState->TransitFailed();
-        if(_currentState != 0)
+        if(_currentState != nullptr)
         {
             _currentState = _currentState->OutlineState();
         }
@@ -146,10 +146,10 @@ void StateController::TransitFailed()
 }
 void StateController::TransitNewData()
 {
-    if(_currentState != 0)
+    if(_currentState != nullptr)
     {
         _currentState = _currentState->TransitNewData();
-        if(_currentState != 0)
+        if(_currentState != nullptr)
         {
             _currentState = _currentState->OutlineState();
         }
@@ -159,10 +159,10 @@ void StateController::TransitNewData()
 }
 void StateController::TransitPause()
 {
-    if(_currentState != 0)
+    if(_currentState != nullptr)
     {
         _currentState = _currentState->TransitPause();
-        if(_currentState != 0)
+        if(_currentState != nullptr)
         {
             _currentState = _currentState->OutlineState();
         }
@@ -172,10 +172,10 @@ void StateController::TransitPause()
 }
 void StateController::TransitResume()
 {
-    if(_currentState != 0)
+    if(_currentState != nullptr)
     {
         _currentState = _currentState->TransitResume();
-        if(_currentState != 0)
+        if(_currentState != nullptr)
         {
             _currentState = _currentState->OutlineState();
         }
@@ -185,10 +185,10 @@ void StateController::TransitResume()
 }
 void StateController::TransitSucceeded()
 {
-    if(_currentState != 0)
+    if(_currentState != nullptr)
     {
         _currentState = _currentState->TransitSucceeded();
-        if(_currentState != 0)
+        if(_currentState != nullptr)
         {
             _currentState = _currentState->OutlineState();
         }
@@ -198,7 +198,7 @@ void StateController::TransitSucceeded()
 }
 const char* StateController::GetCurrentStateName()
 {
-    if(_currentState == 0)
+    if(_currentState == nullptr)
     {
         return "(end)";
     }

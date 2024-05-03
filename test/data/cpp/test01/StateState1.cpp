@@ -10,7 +10,7 @@ StateState1::~StateState1()
 BaseState* StateState1::TransitCommand1()
 {
     _controllee->DoAction1();
-    return 0;
+    return nullptr;
 }
 BaseState* StateState1::TransitCommand2()
 {
@@ -24,7 +24,7 @@ const char* StateState1::GetStateName()
 }
 BaseState* StateState1::GetParent()
 {
-    return 0;
+    return nullptr;
 }
 int StateState1::GetStateID()
 {

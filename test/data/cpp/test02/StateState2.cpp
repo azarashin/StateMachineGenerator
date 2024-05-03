@@ -10,7 +10,7 @@ StateState2::~StateState2()
 BaseState* StateState2::TryTransitWithoutEvent()
 {
     _controllee->DoAction3();
-    return 0;
+    return nullptr;
 }
 const char* StateState2::GetStateName()
 {
@@ -18,7 +18,7 @@ const char* StateState2::GetStateName()
 }
 BaseState* StateState2::GetParent()
 {
-    return 0;
+    return nullptr;
 }
 int StateState2::GetStateID()
 {

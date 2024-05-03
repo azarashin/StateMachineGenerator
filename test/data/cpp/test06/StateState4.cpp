@@ -17,27 +17,27 @@ void StateState4::Setup(bool resume, bool deepResume)
 BaseState* StateState4::TransitEnoughData()
 {
     BaseState* currentSubState = CurrentSubState();
-    if(currentSubState != 0)
+    if(currentSubState != nullptr)
     {
         BaseState* nextState = currentSubState->TransitEnoughData();
         return TransitBySubState(nextState);
     }
-    return 0;
+    return nullptr;
 }
 BaseState* StateState4::TransitNewData()
 {
     BaseState* currentSubState = CurrentSubState();
-    if(currentSubState != 0)
+    if(currentSubState != nullptr)
     {
         BaseState* nextState = currentSubState->TransitNewData();
         return TransitBySubState(nextState);
     }
-    return 0;
+    return nullptr;
 }
 const char* StateState4::GetStateName()
 {
     BaseState* currentSubState = CurrentSubState();
-    if(currentSubState == 0)
+    if(currentSubState == nullptr)
     {
         return "State3.State4(end)";
     }
