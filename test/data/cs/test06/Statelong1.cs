@@ -25,4 +25,8 @@ public class Statelong1 : BaseState
     {
         return _stateController.InstanceOfState3;
     }
+    public override int GetStateID()
+    {
+        return 5;
+    }
 }

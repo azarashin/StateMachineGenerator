@@ -4,12 +4,67 @@ public class StateController
     private BaseState? _currentState;
     public BaseState InstanceOfState1 {get; private set;}
     public BaseState InstanceOfState2 {get; private set;}
+    private BaseState[] _stateList;
     public StateController(IControllee controllee)
     {
         _controllee = controllee;
         InstanceOfState1 = new StateState1(this, _controllee);
         InstanceOfState2 = new StateState2(this, _controllee);
         _currentState = InstanceOfState1;
+        _stateList = new BaseState[] {
+            InstanceOfState1,
+            InstanceOfState2
+        };
+    }
+    public int MaxNumberOfStateIDs()
+    {
+            return 2;
+    }
+    public int GetCurrentIdFromStateId(int parentStateId)
+    {
+        if(parentStateId == -1)
+        {
+            return GetCurrentIdFromState(_currentState);
+        }
+        if(parentStateId < -1 || parentStateId >= MaxNumberOfStateIDs())
+        {
+            return -1;
+        }
+        return GetCurrentIdFromState(_stateList[parentStateId].CurrentSubState());
+    }
+    private int GetCurrentIdFromState(BaseState? state)
+    {
+        if(state == null)
+        {
+            return -1;
+        }
+    return state.GetStateID();
+    }
+    public void ResumeState(int parentStateId, int stateId)
+    {
+        BaseState? state = null;
+        if(stateId >= 0 && stateId < MaxNumberOfStateIDs())
+        {
+            state = _stateList[stateId];
+        }
+        if(parentStateId == -1)
+        {
+            _currentState = state;
+            return;
+        }
+        if(parentStateId < -1 || parentStateId >= MaxNumberOfStateIDs())
+        {
+            return;
+        }
+        _stateList[parentStateId].ResumeSubState(state);
+    }
+    public string StateName(int parentStateId)
+    {
+        if(parentStateId >= 0 && parentStateId < MaxNumberOfStateIDs())
+        {
+            return _stateList[parentStateId].GetStateName();
+        }
+        return "(None)";
     }
     public bool TryTransitWithoutEvent()
     {

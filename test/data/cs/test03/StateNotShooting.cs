@@ -43,4 +43,8 @@ public class StateNotShooting : BaseState
     {
         return null;
     }
+    public override int GetStateID()
+    {
+        return 4;
+    }
 }

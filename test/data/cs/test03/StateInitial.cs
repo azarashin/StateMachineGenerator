@@ -21,4 +21,8 @@ public class StateInitial : BaseState
     {
         return null;
     }
+    public override int GetStateID()
+    {
+        return 3;
+    }
 }

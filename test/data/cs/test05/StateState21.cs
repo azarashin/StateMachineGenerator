@@ -43,4 +43,8 @@ public class StateState21 : BaseState
     {
         return _stateController.InstanceOfState2;
     }
+    public override int GetStateID()
+    {
+        return 2;
+    }
 }

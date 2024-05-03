@@ -15,4 +15,8 @@ public class StateState4 : BaseState
     {
         return null;
     }
+    public override int GetStateID()
+    {
+        return 4;
+    }
 }
