@@ -112,9 +112,13 @@ export abstract class {self._base_state_class_name}
 \t\t}}
 \t\treturn this; 
 \t}}
+\tpublic ResumeSubState(subState: BaseState | null): void
+\t{{
+\t\tthis._currentSubState = subState; 
+\t}}
 \tpublic abstract GetStateName(): string;
 \tpublic abstract GetParent(): {self._base_state_class_name} | null;
-\tpublic abstract GetID(): int;
+\tpublic abstract GetStateID(): number;
 }}
         """
         return ret
@@ -170,6 +174,9 @@ export class {self._console_controllee_class_name} implements {self._icontrollee
     def setup_state_declaration(self, state):
         return f"""\t\tthis.{self._prefix_instance_of}{state.name} = new {self._prefix_state}{state.name}(this, this._controllee);"""
 
+    def state_instance(self, state):
+        return f"""\t\t\tthis.{self._prefix_instance_of}{state.name}"""
+
     def import_state_class(self, state):
         return f"""import {{{self._prefix_state}{state.name}}} from "./{self._prefix_state}{state.name}" """
 
@@ -193,6 +200,7 @@ export class {self._console_controllee_class_name} implements {self._icontrollee
         states = [d for d in state_dic.values()]
         state_declarations = '\n'.join([self.state_declaration(d) for d in sorted(states, key=lambda x: x.name)])
         set_state_declarations = '\n'.join([self.setup_state_declaration(d) for d in sorted(states, key=lambda x: x.name)])
+        state_instance_list = ',\n'.join([self.state_instance(d) for d in sorted(states, key=lambda x: x.name)])
         event_transitions = sorted(list(set([d.event for d in transitions if d.event is not None])))
         transition_list = '\n'.join([self.transition_method_in_state_controller(d) for d in event_transitions])
         import_list = '\n'.join([self.import_state_class(d) for d in sorted(states, key=lambda x: x.name)])
@@ -205,13 +213,66 @@ export class {self._state_controller_class_name}
 {{
 \tprivate  _controllee: {self._icontrollee_class_name};
 \tprivate _currentState: {self._base_state_class_name} | null; 
+\tprivate _stateList: {self._base_state_class_name}[];
 {state_declarations}
+\treadonly MaxNumberOfStateIDs: number = {len(states)}; 
 \tpublic constructor(controllee: {self._icontrollee_class_name})
 \t{{
 \t\tthis._controllee = controllee;
 {set_state_declarations}
 \t\tthis._currentState = this.{self._prefix_instance_of}{initial}; 
+\t\tthis._stateList = [
+{state_instance_list}
+\t\t]; 
 \t}}
+
+\tpublic GetCurrentIdFromStateId(parentStateId: number): number
+\t{{
+\t\tif(parentStateId == -1)
+\t\t{{
+\t\t\treturn this.GetCurrentIdFromState(this._currentState);
+\t\t}}
+\t\tif(parentStateId < -1 || parentStateId >= this.MaxNumberOfStateIDs)
+\t\t{{
+\t\t\treturn -1;
+\t\t}}
+\t\treturn this.GetCurrentIdFromState(this._stateList[parentStateId].CurrentSubState());
+\t}}
+\tprivate GetCurrentIdFromState(state: {self._base_state_class_name} | null): number
+\t{{
+\t\tif(state == null)
+\t\t{{
+\t\t\treturn -1;
+\t\t}}
+\treturn state.GetStateID();
+\t}}
+\tpublic ResumeState(parentStateId: number, stateId: number): void
+\t{{
+\t\tlet state: {self._base_state_class_name} | null = null; 
+\t\tif(stateId >= 0 && stateId < this.MaxNumberOfStateIDs)
+\t\t{{
+\t\t\tstate = this._stateList[stateId]; 
+\t\t}}
+\t\tif(parentStateId == -1)
+\t\t{{
+\t\t\tthis._currentState = state;
+\t\t\treturn;
+\t\t}}
+\t\tif(parentStateId < -1 || parentStateId >= this.MaxNumberOfStateIDs)
+\t\t{{
+\t\t\treturn;
+\t\t}}
+\t\tthis._stateList[parentStateId].ResumeSubState(state);
+\t}}
+\tpublic StateName(parentStateId: number): string
+\t{{
+\t\tif(parentStateId >= 0 && parentStateId < this.MaxNumberOfStateIDs)
+\t\t{{
+\t\t\treturn this._stateList[parentStateId].GetStateName();
+\t\t}}
+\t\treturn "(None)";
+\t}}
+
 \tpublic TryTransitWithoutEvent(): boolean
 \t{{
 \t\tif(this._currentState == null)
@@ -365,7 +426,7 @@ export class {self._prefix_state}{state.name} extends {self._base_state_class_na
 \t{{
 \t\treturn {parent}; 
 \t}}
-\tpublic GetID(): int
+\tpublic GetStateID(): number
 \t{{
 \t\treturn {index}; 
 \t}}
@@ -399,50 +460,81 @@ import {{{self._state_controller_class_name}}} from "./{self._state_controller_c
 
 class TestApp
 {{
-    private _stateController: StateController = new StateController( new ConsoleOutControllee());
+\tprivate _stateController: {self._state_controller_class_name} = new {self._state_controller_class_name}( new ConsoleOutControllee());
 
-    public Run(): void
-    {{
-        this.Step();
-    }}
+\tpublic Run(): void
+\t{{
+\t\tthis.Step();
+\t}}
 
-    private Step(): void
-    {{
-        console.log(`current state: ${{this._stateController.GetCurrentStateName()}}`);
-        if(this._stateController.TryTransitWithoutEvent())
-        {{
-            this.Step();
-        }}
+\tprivate Step(): void
+\t{{
+\t\tconsole.log(`current state: ${{this._stateController.GetCurrentStateName()}}`);
+\t\tif(this._stateController.TryTransitWithoutEvent())
+\t\t{{
+\t\t\tthis.Step();
+\t\t}}
 {menu_list}
-        console.log("");
-        console.log("0. exit");
-        const rl = readline.createInterface({{
-            input: process.stdin,
-            output: process.stdout
-        }});
-        let idStr: string | null = null;
-        rl.question('order: ', (answer) => {{
-            rl.close();
-            this.Transit(Number(answer));
-        }});
-    }}
+\t\tconsole.log("");
+\t\tconsole.log("0. exit");
+\t\tconsole.log("-1. ShowStateIDs then resume");
+\t\tconst rl = readline.createInterface({{
+\t\t\tinput: process.stdin,
+\t\t\toutput: process.stdout
+\t\t}});
+\t\tlet idStr: string | null = null;
+\t\trl.question('order: ', (answer) => {{
+\t\t\trl.close();
+\t\t\tthis.Transit(Number(answer));
+\t\t}});
+\t}}
 
-    private Transit(id: number): void
-    {{
-        if(id)
-        {{
-            switch(id)
-            {{
-                case 0:
-                    break;
+\tprivate Transit(id: number): void
+\t{{
+\t\tif(id)
+\t\t{{
+\t\t\tswitch(id)
+\t\t\t{{
+\t\t\t\tcase 0:
+\t\t\t\t\tbreak;
 {case_list}
-                default:
-                    console.log(`Invalid number: ${{id}}`);
-                    this.Step();
-                    break;
-            }}
-        }}
-    }}
+
+\t\t\t\tcase -1:
+\t\t\t\t{{
+\t\t\t\t\tlet stateId: number = this._stateController.GetCurrentIdFromStateId(-1);
+\t\t\t\t\tconsole.log(`Top State ID: ${{stateId}} - ${{this._stateController.StateName(stateId)}}`);
+\t\t\t\t\tlet subStateIds: number[] = new Array(this._stateController.MaxNumberOfStateIDs);
+\t\t\t\t\tfor(let i: number = 0;i<this._stateController.MaxNumberOfStateIDs;i++)
+\t\t\t\t\t{{
+\t\t\t\t\t\tsubStateIds[i] = this._stateController.GetCurrentIdFromStateId(i);
+\t\t\t\t\t\tconsole.log(`Sub State ID: ${{subStateIds[i]}} - ${{this._stateController.StateName(subStateIds[i])}}`);
+\t\t\t\t\t}}
+
+\t\t\t\t\tthis._stateController = new {self._state_controller_class_name}( new ConsoleOutControllee());
+\t\t\t\t\tconsole.log(`StateController has been reset.`);
+
+\t\t\t\t\tthis._stateController.ResumeState(-1, stateId); 
+\t\t\t\t\tfor(let i: number = 0;i<this._stateController.MaxNumberOfStateIDs;i++)
+\t\t\t\t\t{{
+\t\t\t\t\t\tthis._stateController.ResumeState(i, subStateIds[i]);
+\t\t\t\t\t}}
+
+\t\t\t\t\tstateId = this._stateController.GetCurrentIdFromStateId(-1);
+\t\t\t\t\tconsole.log(`Top State ID: ${{stateId}} - ${{this._stateController.StateName(stateId)}}`);
+\t\t\t\t\tfor(let i: number = 0;i<this._stateController.MaxNumberOfStateIDs;i++)
+\t\t\t\t\t{{
+\t\t\t\t\t\tsubStateIds[i] = this._stateController.GetCurrentIdFromStateId(i);
+\t\t\t\t\t\tconsole.log(`Sub State ID: ${{subStateIds[i]}} - ${{this._stateController.StateName(subStateIds[i])}}`);
+\t\t\t\t\t}}
+\t\t\t\t}}
+
+\t\t\t\tdefault:
+\t\t\t\t\tconsole.log(`Invalid number: ${{id}}`);
+\t\t\t\t\tthis.Step();
+\t\t\t\t\tbreak;
+\t\t\t}}
+\t\t}}
+\t}}
 
 }}
 

@@ -120,6 +120,10 @@ void {self._base_state_class_name}::SetupSubState({self._base_state_class_name}*
 \t}}
 \treturn this; 
 }}
+void {self._base_state_class_name}::ResumeSubState({self._base_state_class_name}* subState)
+{{
+\t_currentSubState = subState; 
+}}
         """
         return ret
 
@@ -146,9 +150,10 @@ public:
 \t{self._base_state_class_name}* TransitBySubState({self._base_state_class_name}* nextState);
 \t{self._base_state_class_name}* TransitForChild({self._base_state_class_name}* child);
 \t{self._base_state_class_name}* OutlineState();
+\tvoid ResumeSubState(BaseState* subState);
 \tvirtual const char* GetStateName() = 0;
 \tvirtual {self._base_state_class_name}* GetParent() = 0;
-\tvirtual int GetID() = 0;
+\tvirtual int GetStateID() = 0;
 }};
         """
         return ret
@@ -237,6 +242,9 @@ public:
     def setup_state_declaration(self, state):
         return f"""\t{self._prefix_instance_of}{state.name} = new {self._prefix_state}{state.name}(this, _controllee);"""
 
+    def state_instance(self, state):
+        return f"""\t\t{self._prefix_instance_of}{state.name}"""
+
     def delete_state_declaration(self, state):
         return f"""\tdelete {self._prefix_instance_of}{state.name};"""
 
@@ -265,21 +273,76 @@ public:
     def generate_state_controller_cpp(self, state_dic, transitions, initial):
         states = [d for d in state_dic.values()]
         set_state_declarations = '\n'.join([self.setup_state_declaration(d) for d in sorted(states, key=lambda x: x.name)])
+        state_instance_list = ',\n'.join([self.state_instance(d) for d in sorted(states, key=lambda x: x.name)])
         delete_states = '\n'.join([self.delete_state_declaration(d) for d in sorted(states, key=lambda x: x.name)])
 
         event_transitions = sorted(list(set([d.event for d in transitions if d.event is not None])))
         transition_list = '\n'.join([self.transition_method_in_state_controller_cpp(d) for d in event_transitions])
         ret = f"""#include "{self._state_controller_class_name}.h"
+#include <string.h>
 {self._state_controller_class_name}::{self._state_controller_class_name}({self._icontrollee_class_name}* controllee)
 {{
 \t_controllee = controllee;
 {set_state_declarations}
 \t_currentState = {self._prefix_instance_of}{initial}; 
+\t{self._base_state_class_name}* stateList[] = {{
+{state_instance_list}
+\t}}; 
+\tmemcpy(_stateList, stateList, sizeof(BaseState*) * MaxNumberOfStateIDs); 
 }}
 {self._state_controller_class_name}::~{self._state_controller_class_name}()
 {{
 {delete_states}
 }}
+
+
+int {self._state_controller_class_name}::GetCurrentIdFromStateId(int parentStateId)
+{{
+\tif(parentStateId == -1)
+\t{{
+\t\treturn GetCurrentIdFromState(_currentState);
+\t}}
+\tif(parentStateId < -1 || parentStateId >= MaxNumberOfStateIDs)
+\t{{
+\t\treturn -1;
+\t}}
+\treturn GetCurrentIdFromState(_stateList[parentStateId]->CurrentSubState());
+}}
+int {self._state_controller_class_name}::GetCurrentIdFromState({self._base_state_class_name}* state)
+{{
+\tif(state == nullptr)
+\t{{
+\t\treturn -1;
+\t}}
+\treturn state->GetStateID();
+\t}}
+void {self._state_controller_class_name}::ResumeState(int parentStateId, int stateId)
+{{
+\t{self._base_state_class_name}* state = nullptr; 
+\tif(stateId >= 0 && stateId < MaxNumberOfStateIDs)
+\t{{
+\t\tstate = _stateList[stateId]; 
+\t}}
+\tif(parentStateId == -1)
+\t{{
+\t\t_currentState = state;
+\t\treturn;
+\t}}
+\tif(parentStateId < -1 || parentStateId >= MaxNumberOfStateIDs)
+\t{{
+\t\treturn;
+\t}}
+\t_stateList[parentStateId]->ResumeSubState(state);
+}}
+const char* {self._state_controller_class_name}::StateName(int parentStateId)
+{{
+\tif(parentStateId >= 0 && parentStateId < MaxNumberOfStateIDs)
+\t{{
+\t\treturn _stateList[parentStateId]->GetStateName();
+\t}}
+\treturn "(None)";
+}}
+
 bool {self._state_controller_class_name}::TryTransitWithoutEvent()
 {{
 \tif(_currentState == nullptr)
@@ -327,13 +390,22 @@ class {self._state_controller_class_name};
 
 class {self._state_controller_class_name}
 {{
+public:
+\tstatic const int MaxNumberOfStateIDs = {len(states)};
 private:
 \t{self._icontrollee_class_name}* _controllee;
 \t{self._base_state_class_name}* _currentState; 
+\t{self._base_state_class_name}* _stateList[MaxNumberOfStateIDs];
+\tint GetCurrentIdFromState({self._base_state_class_name}* state);
 public:
 {state_declarations}
 \t{self._state_controller_class_name}({self._icontrollee_class_name}* controllee);
 \tvirtual ~{self._state_controller_class_name}();
+
+\tint GetCurrentIdFromStateId(int parentStateId);
+\tvoid ResumeState(int parentStateId, int stateId);
+\tconst char* StateName(int parentStateId);
+
 \tbool TryTransitWithoutEvent();
 {transition_list}
 \tconst char* GetCurrentStateName();
@@ -389,12 +461,12 @@ public:
 {self._base_state_class_name}* {self._prefix_state}{state_name}::{self._prefix_method}{event}()
 {{
 \t{self._base_state_class_name}* currentSubState = CurrentSubState();
-\tif(currentSubState != 0)
+\tif(currentSubState != nullptr)
 \t{{
 \t\t{self._base_state_class_name}* nextState = currentSubState->{self._prefix_method}{event}();
 \t\treturn TransitBySubState(nextState);
 \t}}
-\treturn 0; 
+\treturn nullptr; 
 }}
 """
 
@@ -462,7 +534,7 @@ const char* {self._prefix_state}{state.name}::GetStateName()
 {{
 \treturn {parent};
 }}
-int {self._prefix_state}{state.name}::GetID()
+int {self._prefix_state}{state.name}::GetStateID()
 {{
 \treturn {index};
 }}
@@ -510,7 +582,7 @@ public:
 {sub_transition_codes}
 \tvirtual const char* GetStateName();
 \tvirtual {self._base_state_class_name}* GetParent();
-\tvirtual int GetID();
+\tvirtual int GetStateID();
 }};
         """
         return ret
@@ -544,7 +616,7 @@ int main(int argc, const char** argv)
 
 
 \t{self._icontrollee_class_name}* controllee = new ConsoleOutControllee();
-\tStateController* stateController = new StateController(controllee);
+\t{self._state_controller_class_name}* stateController = new {self._state_controller_class_name}(controllee);
 
 \tint number = 1; 
 \twhile(number != 0)
@@ -557,12 +629,45 @@ int main(int argc, const char** argv)
 {menu_list}
 \t\tprintf("\\n");
 \t\tprintf("0. exit\\n");
+\t\tprintf("-1. ShowStateIDs then resume\\n");
 \t\tscanf_s("%d", &number);
 \t\tswitch(number)
 \t\t{{
 \t\t\tcase 0:
 \t\t\t\tbreak;
 {case_list}
+
+\t\t\tcase -1:
+\t\t\t{{
+\t\t\t\tint stateId = stateController->GetCurrentIdFromStateId(-1);
+\t\t\t\tprintf("Top State ID: %d - %s\\n", stateId, stateController->StateName(stateId));
+\t\t\t\tint* subStateIds = new int[stateController->MaxNumberOfStateIDs];
+\t\t\t\tfor(int i=0;i<stateController->MaxNumberOfStateIDs;i++)
+\t\t\t\t{{
+\t\t\t\t\tsubStateIds[i] = stateController->GetCurrentIdFromStateId(i);
+\t\t\t\t\tprintf("Sub State ID: %d - %s\\n", subStateIds[i], stateController->StateName(subStateIds[i]));
+\t\t\t\t}}
+
+\t\t\t\tdelete stateController; 
+\t\t\t\tstateController = new StateController(controllee);
+\t\t\t\tprintf("StateController has been reset.\\n");
+
+\t\t\t\tstateController->ResumeState(-1, stateId); 
+\t\t\t\tfor(int i=0;i<stateController->MaxNumberOfStateIDs;i++)
+\t\t\t\t{{
+\t\t\t\t\tstateController->ResumeState(i, subStateIds[i]);
+\t\t\t\t}}
+
+\t\t\t\tstateId = stateController->GetCurrentIdFromStateId(-1);
+\t\t\t\tprintf("Top State ID: %d - %s\\n", stateId, stateController->StateName(stateId));
+\t\t\t\tfor(int i=0;i<stateController->MaxNumberOfStateIDs;i++)
+\t\t\t\t{{
+\t\t\t\t\tsubStateIds[i] = stateController->GetCurrentIdFromStateId(i);
+\t\t\t\t\tprintf("Sub State ID: %d - %s\\n", subStateIds[i], stateController->StateName(subStateIds[i]));
+\t\t\t\t}}
+\t\t\t\tdelete[] subStateIds; 
+\t\t\t}}
+\t\t\tbreak;
 \t\t\tdefault:
 \t\t\t\tprintf("Invalid number: %d\\n", number);
 \t\t\t\tbreak;
