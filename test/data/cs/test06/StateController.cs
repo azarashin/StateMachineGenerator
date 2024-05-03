@@ -9,6 +9,8 @@ public class StateController
     public BaseState InstanceOfState4 {get; private set;}
     public BaseState InstanceOflong1 {get; private set;}
     public BaseState InstanceOflong2 {get; private set;}
+    private BaseState[] _stateList;
+    public int MaxNumberOfStateIDs {get; private set;} = 7;
     public StateController(IControllee controllee)
     {
         _controllee = controllee;
@@ -20,6 +22,61 @@ public class StateController
         InstanceOflong1 = new Statelong1(this, _controllee);
         InstanceOflong2 = new Statelong2(this, _controllee);
         _currentState = InstanceOfState1;
+        _stateList = new BaseState[] {
+            InstanceOfProcessData,
+            InstanceOfState1,
+            InstanceOfState2,
+            InstanceOfState3,
+            InstanceOfState4,
+            InstanceOflong1,
+            InstanceOflong2
+        };
+    }
+    public int GetCurrentIdFromStateId(int parentStateId)
+    {
+        if(parentStateId == -1)
+        {
+            return GetCurrentIdFromState(_currentState);
+        }
+        if(parentStateId < -1 || parentStateId >= MaxNumberOfStateIDs)
+        {
+            return -1;
+        }
+        return GetCurrentIdFromState(_stateList[parentStateId].CurrentSubState());
+    }
+    private int GetCurrentIdFromState(BaseState? state)
+    {
+        if(state == null)
+        {
+            return -1;
+        }
+    return state.GetStateID();
+    }
+    public void ResumeState(int parentStateId, int stateId)
+    {
+        BaseState? state = null;
+        if(stateId >= 0 && stateId < MaxNumberOfStateIDs)
+        {
+            state = _stateList[stateId];
+        }
+        if(parentStateId == -1)
+        {
+            _currentState = state;
+            return;
+        }
+        if(parentStateId < -1 || parentStateId >= MaxNumberOfStateIDs)
+        {
+            return;
+        }
+        _stateList[parentStateId].ResumeSubState(state);
+    }
+    public string StateName(int parentStateId)
+    {
+        if(parentStateId >= 0 && parentStateId < MaxNumberOfStateIDs)
+        {
+            return _stateList[parentStateId].GetStateName();
+        }
+        return "(None)";
     }
     public bool TryTransitWithoutEvent()
     {

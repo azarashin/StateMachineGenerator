@@ -70,4 +70,8 @@ export class StateState3 extends BaseState
     {
         return null;
     }
+    public GetStateID(): number
+    {
+        return 3;
+    }
 }

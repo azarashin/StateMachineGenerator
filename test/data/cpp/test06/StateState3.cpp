@@ -16,7 +16,7 @@ void StateState3::Setup(bool resume, bool deepResume)
 }
 BaseState* StateState3::TransitAborted()
 {
-    return 0;
+    return nullptr;
 }
 BaseState* StateState3::TransitFailed()
 {
@@ -31,32 +31,32 @@ BaseState* StateState3::TransitPause()
 BaseState* StateState3::TransitSucceeded()
 {
     _controllee->DoSaveResult();
-    return 0;
+    return nullptr;
 }
 BaseState* StateState3::TransitEnoughData()
 {
     BaseState* currentSubState = CurrentSubState();
-    if(currentSubState != 0)
+    if(currentSubState != nullptr)
     {
         BaseState* nextState = currentSubState->TransitEnoughData();
         return TransitBySubState(nextState);
     }
-    return 0;
+    return nullptr;
 }
 BaseState* StateState3::TransitNewData()
 {
     BaseState* currentSubState = CurrentSubState();
-    if(currentSubState != 0)
+    if(currentSubState != nullptr)
     {
         BaseState* nextState = currentSubState->TransitNewData();
         return TransitBySubState(nextState);
     }
-    return 0;
+    return nullptr;
 }
 const char* StateState3::GetStateName()
 {
     BaseState* currentSubState = CurrentSubState();
-    if(currentSubState == 0)
+    if(currentSubState == nullptr)
     {
         return "State3(end)";
     }
@@ -64,5 +64,9 @@ const char* StateState3::GetStateName()
 }
 BaseState* StateState3::GetParent()
 {
-    return 0;
+    return nullptr;
+}
+int StateState3::GetStateID()
+{
+    return 3;
 }

@@ -21,4 +21,8 @@ public class StateConfiguring : BaseState
     {
         return _stateController.InstanceOfNotShooting;
     }
+    public override int GetStateID()
+    {
+        return 0;
+    }
 }

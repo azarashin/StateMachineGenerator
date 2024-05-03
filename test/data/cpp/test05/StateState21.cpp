@@ -23,17 +23,17 @@ BaseState* StateState21::TransitEvent421()
 BaseState* StateState21::TransitEvent431()
 {
     BaseState* currentSubState = CurrentSubState();
-    if(currentSubState != 0)
+    if(currentSubState != nullptr)
     {
         BaseState* nextState = currentSubState->TransitEvent431();
         return TransitBySubState(nextState);
     }
-    return 0;
+    return nullptr;
 }
 const char* StateState21::GetStateName()
 {
     BaseState* currentSubState = CurrentSubState();
-    if(currentSubState == 0)
+    if(currentSubState == nullptr)
     {
         return "State2.State21(end)";
     }
@@ -42,4 +42,8 @@ const char* StateState21::GetStateName()
 BaseState* StateState21::GetParent()
 {
     return _stateController->InstanceOfState2;
+}
+int StateState21::GetStateID()
+{
+    return 2;
 }

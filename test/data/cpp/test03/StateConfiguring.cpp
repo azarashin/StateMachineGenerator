@@ -21,3 +21,7 @@ BaseState* StateConfiguring::GetParent()
 {
     return _stateController->InstanceOfNotShooting;
 }
+int StateConfiguring::GetStateID()
+{
+    return 0;
+}

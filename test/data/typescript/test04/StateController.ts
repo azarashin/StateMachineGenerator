@@ -9,11 +9,13 @@ export class StateController
 {
     private  _controllee: IControllee;
     private _currentState: BaseState | null;
+    private _stateList: BaseState[];
     readonly InstanceOfConfiguring: BaseState;
     readonly InstanceOfEscaped: BaseState;
     readonly InstanceOfIdle: BaseState;
     readonly InstanceOfInitial: BaseState;
     readonly InstanceOfNotShooting: BaseState;
+    readonly MaxNumberOfStateIDs: number = 5;
     public constructor(controllee: IControllee)
     {
         this._controllee = controllee;
@@ -23,6 +25,59 @@ export class StateController
         this.InstanceOfInitial = new StateInitial(this, this._controllee);
         this.InstanceOfNotShooting = new StateNotShooting(this, this._controllee);
         this._currentState = this.InstanceOfInitial;
+        this._stateList = [
+            this.InstanceOfConfiguring,
+            this.InstanceOfEscaped,
+            this.InstanceOfIdle,
+            this.InstanceOfInitial,
+            this.InstanceOfNotShooting
+        ];
+    }
+    public GetCurrentIdFromStateId(parentStateId: number): number
+    {
+        if(parentStateId == -1)
+        {
+            return this.GetCurrentIdFromState(this._currentState);
+        }
+        if(parentStateId < -1 || parentStateId >= this.MaxNumberOfStateIDs)
+        {
+            return -1;
+        }
+        return this.GetCurrentIdFromState(this._stateList[parentStateId].CurrentSubState());
+    }
+    private GetCurrentIdFromState(state: BaseState | null): number
+    {
+        if(state == null)
+        {
+            return -1;
+        }
+    return state.GetStateID();
+    }
+    public ResumeState(parentStateId: number, stateId: number): void
+    {
+        let state: BaseState | null = null;
+        if(stateId >= 0 && stateId < this.MaxNumberOfStateIDs)
+        {
+            state = this._stateList[stateId];
+        }
+        if(parentStateId == -1)
+        {
+            this._currentState = state;
+            return;
+        }
+        if(parentStateId < -1 || parentStateId >= this.MaxNumberOfStateIDs)
+        {
+            return;
+        }
+        this._stateList[parentStateId].ResumeSubState(state);
+    }
+    public StateName(parentStateId: number): string
+    {
+        if(parentStateId >= 0 && parentStateId < this.MaxNumberOfStateIDs)
+        {
+            return this._stateList[parentStateId].GetStateName();
+        }
+        return "(None)";
     }
     public TryTransitWithoutEvent(): boolean
     {

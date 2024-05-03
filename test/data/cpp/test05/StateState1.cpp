@@ -31,5 +31,9 @@ const char* StateState1::GetStateName()
 }
 BaseState* StateState1::GetParent()
 {
+    return nullptr;
+}
+int StateState1::GetStateID()
+{
     return 0;
 }

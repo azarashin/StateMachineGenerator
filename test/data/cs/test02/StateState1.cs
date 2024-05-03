@@ -29,4 +29,8 @@ public class StateState1 : BaseState
     {
         return null;
     }
+    public override int GetStateID()
+    {
+        return 0;
+    }
 }

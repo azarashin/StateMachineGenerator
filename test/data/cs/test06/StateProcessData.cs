@@ -15,4 +15,8 @@ public class StateProcessData : BaseState
     {
         return _stateController.InstanceOfState4;
     }
+    public override int GetStateID()
+    {
+        return 0;
+    }
 }

@@ -21,3 +21,7 @@ BaseState* StateIdle::GetParent()
 {
     return _stateController->InstanceOfNotShooting;
 }
+int StateIdle::GetStateID()
+{
+    return 2;
+}

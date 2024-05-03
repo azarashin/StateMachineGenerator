@@ -13,5 +13,9 @@ const char* StateState4::GetStateName()
 }
 BaseState* StateState4::GetParent()
 {
-    return 0;
+    return nullptr;
+}
+int StateState4::GetStateID()
+{
+    return 4;
 }

@@ -23,17 +23,17 @@ BaseState* StateNotShooting::TransitEscape()
 BaseState* StateNotShooting::TransitEvConfig()
 {
     BaseState* currentSubState = CurrentSubState();
-    if(currentSubState != 0)
+    if(currentSubState != nullptr)
     {
         BaseState* nextState = currentSubState->TransitEvConfig();
         return TransitBySubState(nextState);
     }
-    return 0;
+    return nullptr;
 }
 const char* StateNotShooting::GetStateName()
 {
     BaseState* currentSubState = CurrentSubState();
-    if(currentSubState == 0)
+    if(currentSubState == nullptr)
     {
         return "NotShooting(end)";
     }
@@ -41,5 +41,9 @@ const char* StateNotShooting::GetStateName()
 }
 BaseState* StateNotShooting::GetParent()
 {
-    return 0;
+    return nullptr;
+}
+int StateNotShooting::GetStateID()
+{
+    return 4;
 }

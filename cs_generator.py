@@ -109,8 +109,13 @@ abstract public class {self._base_state_class_name}
 \t\t}}
 \t\treturn this; 
 \t}}
+\tpublic void ResumeSubState(BaseState? subState)
+\t{{
+\t\t_currentSubState = subState; 
+\t}}
 \tpublic abstract string GetStateName();
 \tpublic abstract {self._base_state_class_name}? GetParent();
+\tpublic abstract int GetStateID();
 }}
         """
         return ret
@@ -166,6 +171,9 @@ public class {self._console_controllee_class_name} : {self._icontrollee_class_na
     def setup_state_declaration(self, state):
         return f"""\t\t{self._prefix_instance_of}{state.name} = new {self._prefix_state}{state.name}(this, _controllee);"""
 
+    def state_instance(self, state):
+        return f"""\t\t\t{self._prefix_instance_of}{state.name}"""
+
     def transition_method_in_state_controller(self, event):
         return f"""\tpublic void {self._prefix_method}{event}()
 \t{{
@@ -186,6 +194,7 @@ public class {self._console_controllee_class_name} : {self._icontrollee_class_na
         states = [d for d in state_dic.values()]
         state_declarations = '\n'.join([self.state_declaration(d) for d in sorted(states, key=lambda x: x.name)])
         set_state_declarations = '\n'.join([self.setup_state_declaration(d) for d in sorted(states, key=lambda x: x.name)])
+        state_instance_list = ',\n'.join([self.state_instance(d) for d in sorted(states, key=lambda x: x.name)])
         event_transitions = sorted(list(set([d.event for d in transitions if d.event is not None])))
         transition_list = '\n'.join([self.transition_method_in_state_controller(d) for d in event_transitions])
         ret = f"""
@@ -194,11 +203,62 @@ public class {self._state_controller_class_name}
 \tprivate {self._icontrollee_class_name} _controllee;
 \tprivate {self._base_state_class_name}? _currentState; 
 {state_declarations}
+\tprivate {self._base_state_class_name}[] _stateList;
+\tpublic int MaxNumberOfStateIDs {{get; private set;}} = {len(states)}; 
 \tpublic {self._state_controller_class_name}({self._icontrollee_class_name} controllee)
 \t{{
 \t\t_controllee = controllee;
 {set_state_declarations}
 \t\t_currentState = {self._prefix_instance_of}{initial}; 
+\t\t_stateList = new {self._base_state_class_name}[] {{
+{state_instance_list}
+\t\t}}; 
+\t}}
+\tpublic int GetCurrentIdFromStateId(int parentStateId)
+\t{{
+\t\tif(parentStateId == -1)
+\t\t{{
+\t\t\treturn GetCurrentIdFromState(_currentState);
+\t\t}}
+\t\tif(parentStateId < -1 || parentStateId >= MaxNumberOfStateIDs)
+\t\t{{
+\t\t\treturn -1;
+\t\t}}
+\t\treturn GetCurrentIdFromState(_stateList[parentStateId].CurrentSubState());
+\t}}
+\tprivate int GetCurrentIdFromState({self._base_state_class_name}? state)
+\t{{
+\t\tif(state == null)
+\t\t{{
+\t\t\treturn -1;
+\t\t}}
+\treturn state.GetStateID();
+\t}}
+\tpublic void ResumeState(int parentStateId, int stateId)
+\t{{
+\t\t{self._base_state_class_name}? state = null; 
+\t\tif(stateId >= 0 && stateId < MaxNumberOfStateIDs)
+\t\t{{
+\t\t\tstate = _stateList[stateId]; 
+\t\t}}
+\t\tif(parentStateId == -1)
+\t\t{{
+\t\t\t_currentState = state;
+\t\t\treturn;
+\t\t}}
+\t\tif(parentStateId < -1 || parentStateId >= MaxNumberOfStateIDs)
+\t\t{{
+\t\t\treturn;
+\t\t}}
+\t\t_stateList[parentStateId].ResumeSubState(state);
+\t}}
+\tpublic string StateName(int parentStateId)
+\t{{
+\t\tif(parentStateId >= 0 && parentStateId < MaxNumberOfStateIDs)
+\t\t{{
+\t\t\treturn _stateList[parentStateId].GetStateName();
+\t\t}}
+\t\treturn "(None)";
 \t}}
 \tpublic bool TryTransitWithoutEvent()
 \t{{
@@ -278,7 +338,7 @@ public class {self._state_controller_class_name}
 \t}}
 """
 
-    def generate_state_class(self, state, state_manager, transitions, state_dic):
+    def generate_state_class(self, state, index, state_manager, transitions, state_dic):
         target_transitions = [d for d in transitions if d.state_from == state.name]
         transition_codes = '\n'.join([self.generate_transition(d.event, d.action, d.state_to, d.history, state_dic) for d in sorted(target_transitions, key=lambda x: x.get_event_as_key())])
         description_body = ''
@@ -348,12 +408,17 @@ public class {self._prefix_state}{state.name} : {self._base_state_class_name}
 \t{{
 \t\treturn {parent}; 
 \t}}
+\tpublic override int GetStateID()
+\t{{
+\t\treturn {index}; 
+\t}}
 }}
         """
         return ret
 
     def generate_state_classes(self, state_manager, state_dic, transitions):
-        return {d:self.generate_state_class(d, state_manager, transitions, state_dic) for d in state_dic.values()}
+        states = [(i,k) for i,k in enumerate(sorted(state_dic.keys()))]
+        return {state_dic[k]:self.generate_state_class(state_dic[k], index, state_manager, transitions, state_dic) for index, k in states}
 
     def _transition_menu(self, number, event):
         return f"""\tConsole.WriteLine("{number}. {event}");"""
@@ -370,30 +435,61 @@ public class {self._prefix_state}{state.name} : {self._base_state_class_name}
         case_list = '\n'.join([self._transition_case(i + 1, event_list[i]) for i in range(len(event_list))])
         ret = f"""
 {self._icontrollee_class_name} controllee = new ConsoleOutControllee();
-StateController stateController = new StateController(controllee);
+{self._state_controller_class_name} stateController = new {self._state_controller_class_name}(controllee);
 
 int number = 1; 
 while(number != 0)
 {{
-    Console.WriteLine($"current state: {{stateController.GetCurrentStateName()}}");
-    if(stateController.TryTransitWithoutEvent())
-    {{
-        continue; 
-    }}
+\tConsole.WriteLine($"current state: {{stateController.GetCurrentStateName()}}");
+\tif(stateController.TryTransitWithoutEvent())
+\t{{
+\t\tcontinue; 
+\t}}
 {menu_list}
-    Console.WriteLine("");
-    Console.WriteLine("0. exit");
-    string? line = Console.ReadLine();
-    if(int.TryParse(line, out number))
-    {{
-        switch(number)
-        {{
-            case 0:
-                break;
+\tConsole.WriteLine("");
+\tConsole.WriteLine("0. exit");
+\tConsole.WriteLine("-1. ShowStateIDs then resume");
+\tstring? line = Console.ReadLine();
+\tif(int.TryParse(line, out number))
+\t{{
+\t\tswitch(number)
+\t\t{{
+\t\t\tcase 0:
+\t\t\t\tbreak;
 {case_list}
-            default:
-                Console.WriteLine($"Invalid number: {{number}}");
-                break;
+\t\t\tcase -1:
+\t\t\t{{
+\t\t\t\tint stateId = stateController.GetCurrentIdFromStateId(-1);
+\t\t\t\tConsole.WriteLine($"Top State ID: {{stateId}} - {{stateController.StateName(stateId)}}");
+\t\t\t\tint[] subStateIds = new int[stateController.MaxNumberOfStateIDs];
+\t\t\t\tfor(int i=0;i<stateController.MaxNumberOfStateIDs;i++)
+\t\t\t\t{{
+\t\t\t\t\tsubStateIds[i] = stateController.GetCurrentIdFromStateId(i);
+\t\t\t\t\tConsole.WriteLine($"Sub State ID: {{subStateIds[i]}} - {{stateController.StateName(subStateIds[i])}}");
+\t\t\t\t}}
+
+\t\t\t\tstateController = new StateController(controllee);
+\t\t\t\tConsole.WriteLine($"StateController has been reset.");
+
+\t\t\t\tstateController.ResumeState(-1, stateId); 
+\t\t\t\tfor(int i=0;i<stateController.MaxNumberOfStateIDs;i++)
+\t\t\t\t{{
+\t\t\t\t\tstateController.ResumeState(i, subStateIds[i]);
+\t\t\t\t}}
+
+\t\t\t\tstateId = stateController.GetCurrentIdFromStateId(-1);
+\t\t\t\tConsole.WriteLine($"Top State ID: {{stateId}} - {{stateController.StateName(stateId)}}");
+\t\t\t\tfor(int i=0;i<stateController.MaxNumberOfStateIDs;i++)
+\t\t\t\t{{
+\t\t\t\t\tsubStateIds[i] = stateController.GetCurrentIdFromStateId(i);
+\t\t\t\t\tConsole.WriteLine($"Sub State ID: {{subStateIds[i]}} - {{stateController.StateName(subStateIds[i])}}");
+\t\t\t\t}}
+\t\t\t}}
+
+\t\t\t\tbreak;
+\t\t\tdefault:
+\t\t\t\tConsole.WriteLine($"Invalid number: {{number}}");
+\t\t\t\tbreak;
         }}
     }}
 }}

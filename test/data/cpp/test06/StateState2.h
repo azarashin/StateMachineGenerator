@@ -15,4 +15,5 @@ public:
     virtual BaseState* TransitSucceeded();
     virtual const char* GetStateName();
     virtual BaseState* GetParent();
+    virtual int GetStateID();
 };

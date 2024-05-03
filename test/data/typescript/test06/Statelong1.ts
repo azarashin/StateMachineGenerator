@@ -29,4 +29,8 @@ export class Statelong1 extends BaseState
     {
         return this._stateController.InstanceOfState3;
     }
+    public GetStateID(): number
+    {
+        return 5;
+    }
 }

@@ -15,4 +15,8 @@ public class StateEscaped : BaseState
     {
         return null;
     }
+    public override int GetStateID()
+    {
+        return 1;
+    }
 }

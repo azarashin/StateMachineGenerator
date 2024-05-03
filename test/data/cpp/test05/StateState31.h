@@ -12,4 +12,5 @@ public:
     virtual BaseState* TransitEvent431();
     virtual const char* GetStateName();
     virtual BaseState* GetParent();
+    virtual int GetStateID();
 };

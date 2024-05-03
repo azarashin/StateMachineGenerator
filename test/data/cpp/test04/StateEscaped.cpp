@@ -13,5 +13,9 @@ const char* StateEscaped::GetStateName()
 }
 BaseState* StateEscaped::GetParent()
 {
-    return 0;
+    return nullptr;
+}
+int StateEscaped::GetStateID()
+{
+    return 1;
 }

@@ -25,4 +25,8 @@ export class StateIdle extends BaseState
     {
         return this._stateController.InstanceOfNotShooting;
     }
+    public GetStateID(): number
+    {
+        return 2;
+    }
 }

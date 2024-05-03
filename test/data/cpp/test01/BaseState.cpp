@@ -2,6 +2,7 @@
 BaseState::BaseState(IControllee* controllee)
 {
     _controllee = controllee;
+    _currentSubState = nullptr;
 }
 BaseState::~BaseState()
 {
@@ -34,7 +35,7 @@ void BaseState::SetupSubState(BaseState* child, bool resume)
     {
         _currentSubState = child;
     }
-    if(_currentSubState != 0)
+    if(_currentSubState != nullptr)
     {
         _currentSubState->Setup(false, false);
     }
@@ -45,13 +46,13 @@ BaseState* BaseState::CurrentSubState()
 }
 BaseState* BaseState::TransitBySubState(BaseState* nextState)
 {
-    if(nextState == 0 || _currentSubState == 0)
+    if(nextState == nullptr || _currentSubState == nullptr)
     {
         return nextState;
     }
     BaseState* parentOfNextState = _currentSubState->GetParent();
     BaseState* parentOfCurrentState = nextState->GetParent();
-    if(parentOfNextState != 0 && parentOfCurrentState != 0 && parentOfNextState == parentOfCurrentState)
+    if(parentOfNextState != nullptr && parentOfCurrentState != nullptr && parentOfNextState == parentOfCurrentState)
     {
         _currentSubState = nextState;
         return this;
@@ -62,7 +63,7 @@ BaseState* BaseState::TransitForChild(BaseState* child)
 {
     _currentSubState = child;
     BaseState* parent = GetParent();
-    if(parent != 0)
+    if(parent != nullptr)
     {
         return parent->TransitForChild(this);
     }
@@ -71,9 +72,13 @@ BaseState* BaseState::TransitForChild(BaseState* child)
 BaseState* BaseState::OutlineState()
 {
     BaseState* parent = GetParent();
-    if(parent != 0)
+    if(parent != nullptr)
     {
         return parent->TransitForChild(this);
     }
     return this;
+}
+void BaseState::ResumeSubState(BaseState* subState)
+{
+    _currentSubState = subState;
 }

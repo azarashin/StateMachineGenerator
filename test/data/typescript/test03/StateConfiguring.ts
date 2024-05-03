@@ -25,4 +25,8 @@ export class StateConfiguring extends BaseState
     {
         return this._stateController.InstanceOfNotShooting;
     }
+    public GetStateID(): number
+    {
+        return 0;
+    }
 }

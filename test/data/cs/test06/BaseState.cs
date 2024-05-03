@@ -103,6 +103,11 @@ abstract public class BaseState
         }
         return this;
     }
+    public void ResumeSubState(BaseState? subState)
+    {
+        _currentSubState = subState;
+    }
     public abstract string GetStateName();
     public abstract BaseState? GetParent();
+    public abstract int GetStateID();
 }

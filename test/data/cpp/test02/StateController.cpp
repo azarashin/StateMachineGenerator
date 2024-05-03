@@ -1,25 +1,77 @@
 #include "StateController.h"
+#include <string.h>
 StateController::StateController(IControllee* controllee)
 {
     _controllee = controllee;
     InstanceOfState1 = new StateState1(this, _controllee);
     InstanceOfState2 = new StateState2(this, _controllee);
     _currentState = InstanceOfState1;
+    BaseState* stateList[] = {
+        InstanceOfState1,
+        InstanceOfState2
+    };
+    memcpy(_stateList, stateList, sizeof(BaseState*) * MaxNumberOfStateIDs);
 }
 StateController::~StateController()
 {
     delete InstanceOfState1;
     delete InstanceOfState2;
 }
+int StateController::GetCurrentIdFromStateId(int parentStateId)
+{
+    if(parentStateId == -1)
+    {
+        return GetCurrentIdFromState(_currentState);
+    }
+    if(parentStateId < -1 || parentStateId >= MaxNumberOfStateIDs)
+    {
+        return -1;
+    }
+    return GetCurrentIdFromState(_stateList[parentStateId]->CurrentSubState());
+}
+int StateController::GetCurrentIdFromState(BaseState* state)
+{
+    if(state == nullptr)
+    {
+        return -1;
+    }
+    return state->GetStateID();
+    }
+void StateController::ResumeState(int parentStateId, int stateId)
+{
+    BaseState* state = nullptr;
+    if(stateId >= 0 && stateId < MaxNumberOfStateIDs)
+    {
+        state = _stateList[stateId];
+    }
+    if(parentStateId == -1)
+    {
+        _currentState = state;
+        return;
+    }
+    if(parentStateId < -1 || parentStateId >= MaxNumberOfStateIDs)
+    {
+        return;
+    }
+    _stateList[parentStateId]->ResumeSubState(state);
+}
+const char* StateController::StateName(int parentStateId)
+{
+    if(parentStateId >= 0 && parentStateId < MaxNumberOfStateIDs)
+    {
+        return _stateList[parentStateId]->GetStateName();
+    }
+    return "(None)";
+}
 bool StateController::TryTransitWithoutEvent()
 {
-    if(_currentState == 0)
+    if(_currentState == nullptr)
     {
         return false;
     }
     BaseState* current = _currentState;
     _currentState = _currentState->TryTransitWithoutEvent();
-    if(_currentState != 0)
+    if(_currentState != nullptr)
     {
         _currentState = _currentState->OutlineState();
     }
@@ -27,10 +79,10 @@ bool StateController::TryTransitWithoutEvent()
 }
 void StateController::TransitCommand1()
 {
-    if(_currentState != 0)
+    if(_currentState != nullptr)
     {
         _currentState = _currentState->TransitCommand1();
-        if(_currentState != 0)
+        if(_currentState != nullptr)
         {
             _currentState = _currentState->OutlineState();
         }
@@ -40,7 +92,7 @@ void StateController::TransitCommand1()
 }
 const char* StateController::GetCurrentStateName()
 {
-    if(_currentState == 0)
+    if(_currentState == nullptr)
     {
         return "(end)";
     }
