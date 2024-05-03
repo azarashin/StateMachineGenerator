@@ -5,6 +5,7 @@ public class StateController
     public BaseState InstanceOfState1 {get; private set;}
     public BaseState InstanceOfState2 {get; private set;}
     private BaseState[] _stateList;
+    public int MaxNumberOfStateIDs {get; private set;} = 2;
     public StateController(IControllee controllee)
     {
         _controllee = controllee;
@@ -16,17 +17,13 @@ public class StateController
             InstanceOfState2
         };
     }
-    public int MaxNumberOfStateIDs()
-    {
-            return 2;
-    }
     public int GetCurrentIdFromStateId(int parentStateId)
     {
         if(parentStateId == -1)
         {
             return GetCurrentIdFromState(_currentState);
         }
-        if(parentStateId < -1 || parentStateId >= MaxNumberOfStateIDs())
+        if(parentStateId < -1 || parentStateId >= MaxNumberOfStateIDs)
         {
             return -1;
         }
@@ -43,7 +40,7 @@ public class StateController
     public void ResumeState(int parentStateId, int stateId)
     {
         BaseState? state = null;
-        if(stateId >= 0 && stateId < MaxNumberOfStateIDs())
+        if(stateId >= 0 && stateId < MaxNumberOfStateIDs)
         {
             state = _stateList[stateId];
         }
@@ -52,7 +49,7 @@ public class StateController
             _currentState = state;
             return;
         }
-        if(parentStateId < -1 || parentStateId >= MaxNumberOfStateIDs())
+        if(parentStateId < -1 || parentStateId >= MaxNumberOfStateIDs)
         {
             return;
         }
@@ -60,7 +57,7 @@ public class StateController
     }
     public string StateName(int parentStateId)
     {
-        if(parentStateId >= 0 && parentStateId < MaxNumberOfStateIDs())
+        if(parentStateId >= 0 && parentStateId < MaxNumberOfStateIDs)
         {
             return _stateList[parentStateId].GetStateName();
         }
