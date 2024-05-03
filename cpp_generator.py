@@ -402,7 +402,7 @@ public:
 \tvirtual {self._base_state_class_name}* {self._prefix_method}{event}();
 """
 
-    def generate_state_class_cpp(self, state, state_manager, transitions, state_dic):
+    def generate_state_class_cpp(self, state, index, state_manager, transitions, state_dic):
         target_transitions = [d for d in transitions if d.state_from == state.name]
         transition_codes = '\n'.join([self.generate_transition_cpp(state, d.event, d.action, d.state_to, d.history, state_dic) for d in sorted(target_transitions, key=lambda x: x.get_event_as_key())])
         setup_code = ""
@@ -461,10 +461,14 @@ const char* {self._prefix_state}{state.name}::GetStateName()
 {{
 \treturn {parent};
 }}
+int {self._prefix_state}{state.name}::GetID()
+{{
+\treturn {index};
+}}
 """
         return ret
 
-    def generate_state_class_h(self, state, state_manager, transitions, state_dic):
+    def generate_state_class_h(self, state, index, state_manager, transitions, state_dic):
         target_transitions = [d for d in transitions if d.state_from == state.name]
         transition_codes = '\n'.join([self.generate_transition_h(d.event) for d in sorted(target_transitions, key=lambda x: x.get_event_as_key())])
         description_body = ''
@@ -505,15 +509,18 @@ public:
 {sub_transition_codes}
 \tvirtual const char* GetStateName();
 \tvirtual {self._base_state_class_name}* GetParent();
+\tvirtual int GetID();
 }};
         """
         return ret
 
     def generate_state_classes_cpp(self, state_manager, state_dic, transitions):
-        return {d:self.generate_state_class_cpp(d, state_manager, transitions, state_dic) for d in state_dic.values()}
+        states = [(i,k) for i,k in enumerate(sorted(state_dic.keys()))]
+        return {state_dic[k]:self.generate_state_class_cpp(state_dic[k], index, state_manager, transitions, state_dic) for index, k in states}
 
     def generate_state_classes_h(self, state_manager, state_dic, transitions):
-        return {d:self.generate_state_class_h(d, state_manager, transitions, state_dic) for d in state_dic.values()}
+        states = [(i,k) for i,k in enumerate(sorted(state_dic.keys()))]
+        return {state_dic[k]:self.generate_state_class_h(state_dic[k], index, state_manager, transitions, state_dic) for index, k in states}
 
     def _transition_menu(self, number, event):
         return f"""\t\tprintf("{number}. {event}\\n");"""

@@ -279,7 +279,7 @@ public class {self._state_controller_class_name}
 \t}}
 """
 
-    def generate_state_class(self, state, state_manager, transitions, state_dic):
+    def generate_state_class(self, state, index, state_manager, transitions, state_dic):
         target_transitions = [d for d in transitions if d.state_from == state.name]
         transition_codes = '\n'.join([self.generate_transition(d.event, d.action, d.state_to, d.history, state_dic) for d in sorted(target_transitions, key=lambda x: x.get_event_as_key())])
         description_body = ''
@@ -349,12 +349,17 @@ public class {self._prefix_state}{state.name} : {self._base_state_class_name}
 \t{{
 \t\treturn {parent}; 
 \t}}
+\tpublic override int GetID()
+\t{{
+\t\treturn {index}; 
+\t}}
 }}
         """
         return ret
 
     def generate_state_classes(self, state_manager, state_dic, transitions):
-        return {d:self.generate_state_class(d, state_manager, transitions, state_dic) for d in state_dic.values()}
+        states = [(i,k) for i,k in enumerate(sorted(state_dic.keys()))]
+        return {state_dic[k]:self.generate_state_class(state_dic[k], index, state_manager, transitions, state_dic) for index, k in states}
 
     def _transition_menu(self, number, event):
         return f"""\tConsole.WriteLine("{number}. {event}");"""
