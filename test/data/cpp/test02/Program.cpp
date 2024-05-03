@@ -16,6 +16,7 @@ int main(int argc, const char** argv)
         printf("1. Command1\n");
         printf("\n");
         printf("0. exit\n");
+        printf("-1. ShowStateIDs then resume\n");
         scanf_s("%d", &number);
         switch(number)
         {
@@ -24,6 +25,34 @@ int main(int argc, const char** argv)
             case 1:
                 stateController->TransitCommand1();
                 break;
+            case -1:
+            {
+                int stateId = stateController->GetCurrentIdFromStateId(-1);
+                printf("Top State ID: %d - %s\n", stateId, stateController->StateName(stateId));
+                int* subStateIds = new int[stateController->MaxNumberOfStateIDs];
+                for(int i=0;i<stateController->MaxNumberOfStateIDs;i++)
+                {
+                    subStateIds[i] = stateController->GetCurrentIdFromStateId(i);
+                    printf("Sub State ID: %d - %s\n", subStateIds[i], stateController->StateName(subStateIds[i]));
+                }
+                delete stateController;
+                stateController = new StateController(controllee);
+                printf("StateController has been reset.\n");
+                stateController->ResumeState(-1, stateId);
+                for(int i=0;i<stateController->MaxNumberOfStateIDs;i++)
+                {
+                    stateController->ResumeState(i, subStateIds[i]);
+                }
+                stateId = stateController->GetCurrentIdFromStateId(-1);
+                printf("Top State ID: %d - %s\n", stateId, stateController->StateName(stateId));
+                for(int i=0;i<stateController->MaxNumberOfStateIDs;i++)
+                {
+                    subStateIds[i] = stateController->GetCurrentIdFromStateId(i);
+                    printf("Sub State ID: %d - %s\n", subStateIds[i], stateController->StateName(subStateIds[i]));
+                }
+                delete[] subStateIds;
+            }
+            break;
             default:
                 printf("Invalid number: %d\n", number);
                 break;

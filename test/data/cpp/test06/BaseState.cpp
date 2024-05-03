@@ -2,6 +2,7 @@
 BaseState::BaseState(IControllee* controllee)
 {
     _controllee = controllee;
+    _currentSubState = 0;
 }
 BaseState::~BaseState()
 {
@@ -101,4 +102,8 @@ BaseState* BaseState::OutlineState()
         return parent->TransitForChild(this);
     }
     return this;
+}
+void BaseState::ResumeSubState(BaseState* subState)
+{
+    _currentSubState = subState;
 }

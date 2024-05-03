@@ -15,3 +15,7 @@ BaseState* StateState4::GetParent()
 {
     return 0;
 }
+int StateState4::GetStateID()
+{
+    return 4;
+}

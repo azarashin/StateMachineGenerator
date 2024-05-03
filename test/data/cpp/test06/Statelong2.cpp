@@ -25,3 +25,7 @@ BaseState* Statelong2::GetParent()
 {
     return _stateController->InstanceOfState4;
 }
+int Statelong2::GetStateID()
+{
+    return 6;
+}

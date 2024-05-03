@@ -15,3 +15,7 @@ BaseState* StateProcessData::GetParent()
 {
     return _stateController->InstanceOfState4;
 }
+int StateProcessData::GetStateID()
+{
+    return 0;
+}

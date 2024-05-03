@@ -47,3 +47,7 @@ BaseState* StateState4::GetParent()
 {
     return _stateController->InstanceOfState3;
 }
+int StateState4::GetStateID()
+{
+    return 4;
+}

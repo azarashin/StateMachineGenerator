@@ -21,3 +21,7 @@ BaseState* StateInitial::GetParent()
 {
     return 0;
 }
+int StateInitial::GetStateID()
+{
+    return 3;
+}

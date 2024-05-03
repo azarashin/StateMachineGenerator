@@ -1,4 +1,5 @@
 #include "StateController.h"
+#include <string.h>
 StateController::StateController(IControllee* controllee)
 {
     _controllee = controllee;
@@ -8,6 +9,14 @@ StateController::StateController(IControllee* controllee)
     InstanceOfInitial = new StateInitial(this, _controllee);
     InstanceOfNotShooting = new StateNotShooting(this, _controllee);
     _currentState = InstanceOfInitial;
+    BaseState* stateList[] = {
+        InstanceOfConfiguring,
+        InstanceOfEscaped,
+        InstanceOfIdle,
+        InstanceOfInitial,
+        InstanceOfNotShooting
+    };
+    memcpy(_stateList, stateList, sizeof(BaseState*) * MaxNumberOfStateIDs);
 }
 StateController::~StateController()
 {
@@ -16,6 +25,52 @@ StateController::~StateController()
     delete InstanceOfIdle;
     delete InstanceOfInitial;
     delete InstanceOfNotShooting;
+}
+int StateController::GetCurrentIdFromStateId(int parentStateId)
+{
+    if(parentStateId == -1)
+    {
+        return GetCurrentIdFromState(_currentState);
+    }
+    if(parentStateId < -1 || parentStateId >= MaxNumberOfStateIDs)
+    {
+        return -1;
+    }
+    return GetCurrentIdFromState(_stateList[parentStateId]->CurrentSubState());
+}
+int StateController::GetCurrentIdFromState(BaseState* state)
+{
+    if(state == 0)
+    {
+        return -1;
+    }
+    return state->GetStateID();
+    }
+void StateController::ResumeState(int parentStateId, int stateId)
+{
+    BaseState* state = 0;
+    if(stateId >= 0 && stateId < MaxNumberOfStateIDs)
+    {
+        state = _stateList[stateId];
+    }
+    if(parentStateId == -1)
+    {
+        _currentState = state;
+        return;
+    }
+    if(parentStateId < -1 || parentStateId >= MaxNumberOfStateIDs)
+    {
+        return;
+    }
+    _stateList[parentStateId]->ResumeSubState(state);
+}
+const char* StateController::StateName(int parentStateId)
+{
+    if(parentStateId >= 0 && parentStateId < MaxNumberOfStateIDs)
+    {
+        return _stateList[parentStateId]->GetStateName();
+    }
+    return "(None)";
 }
 bool StateController::TryTransitWithoutEvent()
 {

@@ -20,3 +20,7 @@ BaseState* StateState2::GetParent()
 {
     return 0;
 }
+int StateState2::GetStateID()
+{
+    return 1;
+}

@@ -43,3 +43,7 @@ BaseState* StateNotShooting::GetParent()
 {
     return 0;
 }
+int StateNotShooting::GetStateID()
+{
+    return 4;
+}

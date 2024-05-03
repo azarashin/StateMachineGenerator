@@ -21,3 +21,7 @@ BaseState* StateState31::GetParent()
 {
     return _stateController->InstanceOfState21;
 }
+int StateState31::GetStateID()
+{
+    return 3;
+}

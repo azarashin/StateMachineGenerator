@@ -66,3 +66,7 @@ BaseState* StateState3::GetParent()
 {
     return 0;
 }
+int StateState3::GetStateID()
+{
+    return 3;
+}

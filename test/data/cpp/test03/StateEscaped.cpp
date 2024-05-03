@@ -15,3 +15,7 @@ BaseState* StateEscaped::GetParent()
 {
     return 0;
 }
+int StateEscaped::GetStateID()
+{
+    return 1;
+}
